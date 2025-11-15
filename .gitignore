@@ -25,6 +25,8 @@ hs_err_pid*
 replay_pid*
 
 # macos files
-
 .DS_STORE
 .idea/
+
+# env variables
+.env
