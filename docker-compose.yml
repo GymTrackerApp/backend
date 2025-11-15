@@ -12,7 +12,7 @@ services:
       - "5432:5432"
   app:
     build: .
-    restart: on-failure
+    container_name: spring_app
     ports:
       - "8080:8080"
     depends_on:
