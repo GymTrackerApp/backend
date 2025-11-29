@@ -1,12 +1,14 @@
 package com.gymtracker.app.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -15,7 +17,7 @@ import java.util.Date;
 @Component
 public class JwtService {
     private final Clock clock;
-    private final Key signingKey;
+    private final SecretKey signingKey;
 
     public JwtService(Clock clock, @Value("${jwt.secret.key}") String secretKey) {
         this.clock = clock;
@@ -35,5 +37,22 @@ public class JwtService {
                 .and()
                 .signWith(signingKey)
                 .compact();
+    }
+
+    public String extractSubject(String jwt) {
+        Claims claims = Jwts.parser()
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(jwt)
+                .getPayload();
+
+        return claims.getSubject();
+    }
+
+    public boolean isTokenValid(String jwt, UserDetails userDetails) {
+        String tokenUserId = extractSubject(jwt);
+        String databaseUserId = userDetails.getUsername();
+
+        return tokenUserId.equals(databaseUserId);
     }
 }

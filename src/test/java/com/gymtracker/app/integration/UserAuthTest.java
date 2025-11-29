@@ -71,7 +71,7 @@ class UserAuthTest {
         User user = userRepository.findAll().iterator().next();
 
         Assertions.assertNotNull(user);
-        Assertions.assertEquals(signUp.username(), user.getUsername());
+        Assertions.assertEquals(signUp.username(), user.getDisplayUsername());
         Assertions.assertNotEquals(signUp.password(), user.getPasswordHash());
     }
 

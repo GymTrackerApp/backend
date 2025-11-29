@@ -1,4 +1,4 @@
-package com.gymtracker.app.service;
+package com.gymtracker.app.service.impl;
 
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
@@ -9,6 +9,7 @@ import com.gymtracker.app.exception.SignInException;
 import com.gymtracker.app.mapper.UserMapper;
 import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.security.JwtService;
+import com.gymtracker.app.service.AuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +34,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void signUp(SignUp signUp) {
-        if (userRepository.existsByEmail(signUp.email()))
-            throw new UserAlreadyExistsException("A user with this email already exists.");
+        if (userRepository.existsByEmail(signUp.email()) || userRepository.existsByUsername(signUp.username()))
+            throw new UserAlreadyExistsException("A user with this email or username already exists.");
 
         User user = userMapper.signUpToUser(signUp);
         user.setCreatedAt(Instant.now(clock));
@@ -51,8 +52,8 @@ public class AuthServiceImpl implements AuthService {
         if (!passwordEncoder.matches(signIn.password(), user.getPasswordHash()))
             throw new SignInException("Email or password incorrect");
 
-        String jwt = jwtService.generateToken(user.getUsername(), user.getUserId().toString());
+        String jwt = jwtService.generateToken(user.getDisplayUsername(), user.getUsername());
 
-        return new SignInResponse(user.getUsername(), jwt);
+        return new SignInResponse(user.getDisplayUsername(), jwt);
     }
 }

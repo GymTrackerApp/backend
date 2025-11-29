@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ignored) {
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
         ErrorResponse errorResponse = new ErrorResponse(400, "The submitted data is invalid");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

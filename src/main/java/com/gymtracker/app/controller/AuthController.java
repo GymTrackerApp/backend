@@ -2,6 +2,7 @@ package com.gymtracker.app.controller;
 
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
+import com.gymtracker.app.dto.response.MessageResponse;
 import com.gymtracker.app.dto.response.SignInResponse;
 import com.gymtracker.app.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -22,11 +23,11 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<String> signUp(@RequestBody SignUp signUp) {
+    public ResponseEntity<MessageResponse> signUp(@RequestBody SignUp signUp) {
         authService.signUp(signUp);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("User registered successfully");
+                .body(new MessageResponse("User registered successfully"));
     }
 
     @PostMapping("/sign-in")
