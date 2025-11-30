@@ -6,6 +6,7 @@ import com.gymtracker.app.dto.response.MessageResponse;
 import com.gymtracker.app.dto.response.SignInResponse;
 import com.gymtracker.app.service.AuthService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,13 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
-
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/sign-up")
     public ResponseEntity<MessageResponse> signUp(@Valid @RequestBody SignUp signUp) {

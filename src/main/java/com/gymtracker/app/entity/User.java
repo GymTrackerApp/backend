@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -33,6 +35,9 @@ public class User implements UserDetails {
     private String email;
     private String passwordHash;
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<Exercise> exercises;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
