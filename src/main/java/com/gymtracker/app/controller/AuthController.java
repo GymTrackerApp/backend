@@ -5,8 +5,10 @@ import com.gymtracker.app.dto.request.SignUp;
 import com.gymtracker.app.dto.response.MessageResponse;
 import com.gymtracker.app.dto.response.SignInResponse;
 import com.gymtracker.app.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<MessageResponse> signUp(@RequestBody SignUp signUp) {
+    public ResponseEntity<MessageResponse> signUp(@Valid @RequestBody SignUp signUp) {
         authService.signUp(signUp);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -31,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SignInResponse> signIn(@RequestBody SignIn signIn) {
+    public ResponseEntity<SignInResponse> signIn(@Valid @RequestBody SignIn signIn) {
         SignInResponse response = authService.signIn(signIn);
 
         return ResponseEntity.ok(response);

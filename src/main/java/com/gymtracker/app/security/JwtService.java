@@ -48,11 +48,4 @@ public class JwtService {
 
         return claims.getSubject();
     }
-
-    public boolean isTokenValid(String jwt, UserDetails userDetails) {
-        String tokenUserId = extractSubject(jwt);
-        String databaseUserId = userDetails.getUsername();
-
-        return tokenUserId.equals(databaseUserId);
-    }
 }

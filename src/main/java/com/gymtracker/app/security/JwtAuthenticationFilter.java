@@ -68,11 +68,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
 
-                if (jwtService.isTokenValid(jwt, userDetails)) {
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,  userDetails.getAuthorities());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,  userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (UsernameNotFoundException e) {
                 writeJsonErrorResponse(response, new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: Invalid credentials or user not found."));
                 return;
