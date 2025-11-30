@@ -32,7 +32,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/auth/sign-up", "/auth/sign-in")
                                 .permitAll()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                                .requestMatchers("/swagger-ui/**", "/v3/**")
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()

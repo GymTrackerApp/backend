@@ -16,6 +16,6 @@ public record SignUp(
         String email,
 
         @NotBlank(message = "Password is required")
-        @Length(min = 5, max = 20, message = "The password must be between 5-20 characters long")
+        @Length(min = 8, max = 128, message = "The password must be between 8-128 characters long")
         String password) {
 }

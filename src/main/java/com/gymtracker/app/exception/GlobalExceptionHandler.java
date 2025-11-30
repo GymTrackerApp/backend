@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = SignInException.class)
     public ResponseEntity<ErrorResponse> handleSignInException(SignInException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(value = UserAlreadyExistsException.class)

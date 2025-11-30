@@ -49,8 +49,6 @@ class InputValidationTests {
 
         Set<ConstraintViolation<SignIn>> violationSet = validator.validate(signIn);
 
-        System.out.println(violationSet);
-
         Assertions.assertEquals(1, violationSet.size());
         Assertions.assertEquals("password", violationSet.iterator().next().getPropertyPath().toString());
     }
@@ -74,14 +72,12 @@ class InputValidationTests {
     @ValueSource(strings = {
             "",
             "123", // too short
-            "012345678901234567890" // too long
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." // too long
     })
     void givenInvalidSignUpPassword_whenValidated_ShouldViolateRules(String password) {
         SignUp signUp = new SignUp("username", "email@domain.com", password);
 
         Set<ConstraintViolation<SignUp>> violationSet = validator.validate(signUp);
-
-        System.out.println(violationSet);
 
         Assertions.assertFalse(violationSet.isEmpty());
         Assertions.assertEquals("password", violationSet.iterator().next().getPropertyPath().toString());
@@ -97,8 +93,6 @@ class InputValidationTests {
         SignUp signUp = new SignUp(username, "email@domain.com", "Password123@");
 
         Set<ConstraintViolation<SignUp>> violationSet = validator.validate(signUp);
-
-        System.out.println(violationSet);
 
         Assertions.assertFalse(violationSet.isEmpty());
         Assertions.assertEquals("username", violationSet.iterator().next().getPropertyPath().toString());
