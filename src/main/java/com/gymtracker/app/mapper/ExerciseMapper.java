@@ -14,6 +14,7 @@ public interface ExerciseMapper {
     ExerciseDTO exerciseToExerciseDTO(Exercise exercise);
 
     @Mapping(source = "ownerId", target = "owner.userId")
+    @Mapping(source = "custom", target = "isCustom")
     ExerciseEntity exerciseToExerciseEntity(Exercise exercise);
 
     @Mapping(source = "custom", target = "isCustom")
