@@ -1,7 +1,7 @@
 package com.gymtracker.app.integration;
 
-import com.gymtracker.app.domain.Exercise;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
+import com.gymtracker.app.dto.response.ExerciseDTO;
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.repository.jpa.SpringDataJpaExerciseRepository;
@@ -88,8 +88,6 @@ public class ExerciseTest {
         Assertions.assertEquals(1, exerciseRepository.count());
         Assertions.assertEquals(exerciseCreationRequest.name(), exercise.getName());
         Assertions.assertEquals(savedUser.getUserId(), exercise.getOwner().getUserId());
-
-        exerciseRepository.deleteAll();
     }
 
     @Test
@@ -129,11 +127,8 @@ public class ExerciseTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(Exercise.class)
+                .expectBodyList(ExerciseDTO.class)
                 .hasSize(userExercises.size());
-
-        exerciseRepository.deleteAll();
-        userRepository.deleteAll();
     }
 
     @Test
@@ -155,9 +150,7 @@ public class ExerciseTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBodyList(Exercise.class)
+                .expectBodyList(ExerciseDTO.class)
                 .hasSize(predefinedExercises.size());
-
-        exerciseRepository.deleteAll();
     }
 }

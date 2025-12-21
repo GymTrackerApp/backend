@@ -27,7 +27,7 @@ public class ExerciseServiceImpl implements ExerciseService {
             throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in predefined exercises",  exercise.getName()));
 
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserDoesNotExistException("Owner not found."));
+                .orElseThrow(() -> new UserDoesNotExistException("Owner not found"));
 
         Exercise customExercise = owner.createCustomExercise(exercise.getName());
 
