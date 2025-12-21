@@ -2,7 +2,7 @@ package com.gymtracker.app.mapper;
 
 import com.gymtracker.app.domain.Exercise;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
-import com.gymtracker.app.dto.response.UserExerciseDTO;
+import com.gymtracker.app.dto.response.ExerciseDTO;
 import com.gymtracker.app.entity.ExerciseEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,7 +11,7 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ExerciseMapper {
     Exercise exerciseCreationRequestToExercise(ExerciseCreationRequest exerciseCreationRequest);
-    UserExerciseDTO exerciseToUserExerciseDTO(Exercise exercise);
+    ExerciseDTO exerciseToExerciseDTO(Exercise exercise);
 
     @Mapping(source = "ownerId", target = "owner.userId")
     ExerciseEntity exerciseToExerciseEntity(Exercise exercise);

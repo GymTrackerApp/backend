@@ -65,4 +65,19 @@ class ExerciseControllerTest {
                         .content(objectMapper.writeValueAsString(exerciseCreationRequest)))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError());
     }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidRequest_whenGetUserExercisesCalled_shouldReturnOkResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/exercises/user"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    void givenNoAuthentication_whenGetPredefinedExercisesCalled_shouldReturnOkResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/exercises"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
 }

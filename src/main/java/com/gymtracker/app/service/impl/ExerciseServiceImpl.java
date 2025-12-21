@@ -10,6 +10,7 @@ import com.gymtracker.app.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -31,5 +32,18 @@ public class ExerciseServiceImpl implements ExerciseService {
         Exercise customExercise = owner.createCustomExercise(exercise.getName());
 
         return exerciseRepository.save(customExercise);
+    }
+
+    @Override
+    public Set<Exercise> getUserExercises(UUID ownerId) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Owner not found"));
+
+        return owner.getExercises();
+    }
+
+    @Override
+    public Set<Exercise> getPredefinedExercises() {
+        return exerciseRepository.findAllPredefinedExercises();
     }
 }
