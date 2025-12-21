@@ -33,8 +33,6 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/**")
                                 .permitAll()
-                                .requestMatchers("/exercises/**")
-                                .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )

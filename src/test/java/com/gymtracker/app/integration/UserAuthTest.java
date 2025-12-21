@@ -3,7 +3,6 @@ package com.gymtracker.app.integration;
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
 import com.gymtracker.app.entity.UserEntity;
-import com.gymtracker.app.mapper.UserMapper;
 import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -36,9 +35,6 @@ class UserAuthTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private UserMapper userMapper;
 
     @DynamicPropertySource
     static void setTestDatabaseProperties(DynamicPropertyRegistry registry) {
