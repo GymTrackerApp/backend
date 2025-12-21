@@ -10,8 +10,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 
-import java.time.Instant;
-
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = ExerciseMapper.class)
 public interface UserMapper {
     User signUpToUser(SignUp signUp);

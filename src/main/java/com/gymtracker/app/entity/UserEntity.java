@@ -1,5 +1,6 @@
 package com.gymtracker.app.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
@@ -36,6 +37,7 @@ public class UserEntity {
     private String passwordHash;
 
     @CreatedDate
+    @Column(updatable = false, nullable = false)
     private Instant createdAt;
 
     @OneToMany(mappedBy = "owner")
