@@ -1,11 +1,34 @@
 package com.gymtracker.app.mapper;
 
+import com.gymtracker.app.domain.Password;
+import com.gymtracker.app.domain.User;
 import com.gymtracker.app.dto.request.SignUp;
-import com.gymtracker.app.entity.User;
+import com.gymtracker.app.entity.UserEntity;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = ExerciseMapper.class)
 public interface UserMapper {
     User signUpToUser(SignUp signUp);
+
+    User userEntityToUser(UserEntity userEntity);
+
+    @Mapping(target = "exercises", ignore = true)
+    User userEntityToUserWithoutExercises(UserEntity userEntity);
+
+    @AfterMapping
+    default void handlePasswordMapping(UserEntity userEntity, @MappingTarget User user) {
+        user.updatePassword(userEntity.getPasswordHash());
+    }
+
+    @Mapping(target = "passwordHash", source = "password")
+    @Mapping(target = "username", source = "displayUsername")
+    UserEntity userToUserEntity(User user);
+
+    default Password map(String value) {
+        return new Password(value);
+    }
 }

@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("Invalid user id format.");
         }
 
-        return userRepository.findById(uuid)
+        return userRepository.findByIdWithoutExercises(uuid)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + uuid));
     }
 }

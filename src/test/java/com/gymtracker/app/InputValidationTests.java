@@ -1,5 +1,6 @@
 package com.gymtracker.app;
 
+import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
 import jakarta.validation.ConstraintViolation;
@@ -96,5 +97,25 @@ class InputValidationTests {
 
         Assertions.assertFalse(violationSet.isEmpty());
         Assertions.assertEquals("username", violationSet.iterator().next().getPropertyPath().toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                    "",
+                    "   ",
+                    "A", // Too short
+                    "!!@@##$$", // Invalid characters
+                    "ThisIsAnExcessivelyLongExerciseNameThatShouldTriggerValidationErrorsBecauseItExceedsTheMaximumAllowedLength"
+            }
+    )
+    void givenInvalidExerciseCreationRequest_whenValidated_shouldDetectRulesViolation(String exerciseName) {
+        ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
+                .name(exerciseName)
+                .build();
+
+        Set<ConstraintViolation<ExerciseCreationRequest>> violations = validator.validate(exerciseCreationRequest);
+
+        Assertions.assertNotEquals(0, violations.size());
     }
 }

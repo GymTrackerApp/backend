@@ -1,38 +1,42 @@
-package com.gymtracker.app.entity;
+package com.gymtracker.app.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users")
-@Setter
-@Getter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID userId;
+    private final UUID userId;
     private String username;
     private String email;
-    private String passwordHash;
-    private Instant createdAt;
+
+    @Setter(AccessLevel.NONE)
+    private Password password;
+    private Set<Exercise> exercises;
+
+    public void updatePassword(String passwordHash) {
+        this.password = new Password(passwordHash);
+    }
+
+    public Exercise createCustomExercise(String name) {
+        return Exercise.builder()
+                .name(name)
+                .isCustom(true)
+                .ownerId(this.userId)
+                .build();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -41,7 +45,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return passwordHash;
+        return password.hashedPassword();
     }
 
     @Override
