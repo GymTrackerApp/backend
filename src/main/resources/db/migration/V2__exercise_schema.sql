@@ -1,5 +1,5 @@
 CREATE TABLE EXERCISES (
-    exercise_id BIGINT PRIMARY KEY,
+    exercise_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     is_custom BOOLEAN NOT NULL,
     owner_id UUID,

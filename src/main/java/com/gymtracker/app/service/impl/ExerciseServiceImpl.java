@@ -1,35 +1,35 @@
 package com.gymtracker.app.service.impl;
 
-import com.gymtracker.app.dto.request.ExerciseCreationRequest;
-import com.gymtracker.app.dto.response.UserExerciseDTO;
-import com.gymtracker.app.entity.Exercise;
-import com.gymtracker.app.entity.User;
+import com.gymtracker.app.domain.Exercise;
+import com.gymtracker.app.domain.User;
 import com.gymtracker.app.exception.ExerciseAlreadyExistsException;
-import com.gymtracker.app.mapper.ExerciseMapper;
+import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.repository.ExerciseRepository;
+import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class ExerciseServiceImpl implements ExerciseService {
-    private final ExerciseMapper exerciseMapper;
     private final ExerciseRepository exerciseRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public UserExerciseDTO createExercise(ExerciseCreationRequest exerciseCreationRequest, User owner) {
-        if (exerciseRepository.existsByNameAndOwnerUserId(exerciseCreationRequest.name(), owner.getUserId()))
-            throw new ExerciseAlreadyExistsException(String.format("Exercise with name %s already exists in your exercises",  exerciseCreationRequest.name()));
-        else if (exerciseRepository.existsByNameAndOwnerIsNull(exerciseCreationRequest.name()))
-            throw new ExerciseAlreadyExistsException(String.format("Exercise with name %s already exists in predefined exercises",  exerciseCreationRequest.name()));
+    public Exercise createCustomExercise(Exercise exercise, UUID ownerId) {
+        if (exerciseRepository.existsByNameAndOwnerUserId(exercise.getName(), ownerId))
+            throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in your exercises",  exercise.getName()));
+        else if (exerciseRepository.existsByNameAndOwnerIsNull(exercise.getName()))
+            throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in predefined exercises",  exercise.getName()));
 
-        Exercise exercise = exerciseMapper.exerciseCreationRequestToExercise(exerciseCreationRequest);
-        exercise.setCustom(true);
-        exercise.setOwner(owner);
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Owner not found."));
 
-        Exercise savedExercise = exerciseRepository.save(exercise);
+        Exercise customExercise = owner.createCustomExercise(exercise.getName());
 
-        return exerciseMapper.exerciseToUserExerciseDTO(savedExercise);
+        return exerciseRepository.save(customExercise);
     }
 }

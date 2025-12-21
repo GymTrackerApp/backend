@@ -1,16 +1,17 @@
 package com.gymtracker.app.integration;
 
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
-import com.gymtracker.app.entity.Exercise;
-import com.gymtracker.app.entity.User;
-import com.gymtracker.app.repository.ExerciseRepository;
-import com.gymtracker.app.repository.UserRepository;
+import com.gymtracker.app.entity.ExerciseEntity;
+import com.gymtracker.app.entity.UserEntity;
+import com.gymtracker.app.repository.jpa.SpringDataJpaExerciseRepository;
+import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -28,13 +29,16 @@ public class ExerciseTest {
     private WebTestClient webTestClient;
 
     @Autowired
-    private ExerciseRepository exerciseRepository;
+    private SpringDataJpaExerciseRepository exerciseRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private SpringDataJpaUserRepository userRepository;
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @AfterEach
     void cleanUp() {
@@ -59,13 +63,14 @@ public class ExerciseTest {
                 .name("My new exercise")
                 .build();
 
-        User user = User.builder()
+        UserEntity user = UserEntity.builder()
                 .username("testuser")
+                .passwordHash(passwordEncoder.encode("testpassword123@"))
                 .build();
 
-        User savedUser = userRepository.save(user);
+        UserEntity savedUser = userRepository.save(user);
 
-        String jwt = jwtService.generateToken(savedUser.getDisplayUsername(), savedUser.getUsername());
+        String jwt = jwtService.generateToken(savedUser.getUsername(), savedUser.getUserId().toString());
 
         webTestClient.post()
                 .uri("/exercises")
@@ -75,7 +80,7 @@ public class ExerciseTest {
                 .expectStatus()
                 .isCreated();
 
-        Exercise exercise = exerciseRepository.findAll().iterator().next();
+        ExerciseEntity exercise = exerciseRepository.findAll().iterator().next();
         Assertions.assertEquals(1, exerciseRepository.count());
         Assertions.assertEquals(exerciseCreationRequest.name(), exercise.getName());
         Assertions.assertEquals(savedUser.getUserId(), exercise.getOwner().getUserId());

@@ -2,8 +2,9 @@ package com.gymtracker.app.integration;
 
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
-import com.gymtracker.app.entity.User;
-import com.gymtracker.app.repository.UserRepository;
+import com.gymtracker.app.entity.UserEntity;
+import com.gymtracker.app.mapper.UserMapper;
+import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,10 +32,13 @@ class UserAuthTest {
     private WebTestClient webTestClient;
 
     @Autowired
-    private UserRepository userRepository;
+    private SpringDataJpaUserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @DynamicPropertySource
     static void setTestDatabaseProperties(DynamicPropertyRegistry registry) {
@@ -68,10 +72,10 @@ class UserAuthTest {
                 .expectStatus()
                 .isCreated();
 
-        User user = userRepository.findAll().iterator().next();
+        UserEntity user = userRepository.findAll().iterator().next();
 
         Assertions.assertNotNull(user);
-        Assertions.assertEquals(signUp.username(), user.getDisplayUsername());
+        Assertions.assertEquals(signUp.username(), user.getUsername());
         Assertions.assertNotEquals(signUp.password(), user.getPasswordHash());
     }
 
@@ -83,7 +87,7 @@ class UserAuthTest {
                 .password("testuser123")
                 .build();
 
-        User user = User.builder()
+        UserEntity user = UserEntity.builder()
                 .username("testuser")
                 .email("test.user@domain.com")
                 .passwordHash(passwordEncoder.encode("testuser123"))
@@ -110,7 +114,7 @@ class UserAuthTest {
                 .password(plainPassword)
                 .build();
 
-        User user = User.builder()
+        UserEntity user = UserEntity.builder()
                 .email("test.user@domain.com")
                 .createdAt(Instant.now())
                 .username("testuser")

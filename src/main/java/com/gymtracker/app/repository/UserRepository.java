@@ -1,17 +1,15 @@
 package com.gymtracker.app.repository;
 
-import com.gymtracker.app.entity.User;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import com.gymtracker.app.domain.User;
 
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
-public interface UserRepository extends CrudRepository<User, UUID> {
+public interface UserRepository {
     Optional<User> findByEmail(String email);
-
+    Optional<User> findById(UUID userId);
+    Optional<User> findByIdWithoutExercises(UUID userId);
     boolean existsByEmail(String email);
-
     boolean existsByUsername(String username);
+    User save(User user);
 }

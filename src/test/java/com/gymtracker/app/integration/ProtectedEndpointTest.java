@@ -2,7 +2,7 @@ package com.gymtracker.app.integration;
 
 import com.gymtracker.app.TestController;
 import com.gymtracker.app.config.UtilsConfig;
-import com.gymtracker.app.entity.User;
+import com.gymtracker.app.domain.User;
 import com.gymtracker.app.security.JwtAuthenticationFilter;
 import com.gymtracker.app.security.JwtService;
 import com.gymtracker.app.security.SecurityConfig;

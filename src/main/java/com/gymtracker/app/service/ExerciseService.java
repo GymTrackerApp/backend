@@ -1,11 +1,9 @@
 package com.gymtracker.app.service;
 
-import com.gymtracker.app.dto.request.ExerciseCreationRequest;
-import com.gymtracker.app.dto.response.UserExerciseDTO;
-import com.gymtracker.app.entity.User;
+import com.gymtracker.app.domain.Exercise;
 
 import java.util.UUID;
 
 public interface ExerciseService {
-    UserExerciseDTO createExercise(ExerciseCreationRequest exerciseCreationRequest, User owner);
+    Exercise createCustomExercise(Exercise exercise, UUID ownerId);
 }
