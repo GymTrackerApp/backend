@@ -7,7 +7,9 @@ import com.gymtracker.app.repository.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -32,5 +34,13 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
         ExerciseEntity savedExerciseEntity = repository.save(exerciseEntity);
 
         return mapper.exerciseEntityToExercise(savedExerciseEntity);
+    }
+
+    @Override
+    public Set<Exercise> findAllPredefinedExercises() {
+        Set<ExerciseEntity> exerciseEntities = repository.findAllByOwnerIsNull();
+        return exerciseEntities.stream()
+                .map(mapper::exerciseEntityToExercise)
+                .collect(Collectors.toSet());
     }
 }

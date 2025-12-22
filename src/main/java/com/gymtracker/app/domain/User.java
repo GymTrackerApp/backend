@@ -30,11 +30,12 @@ public class User implements UserDetails {
         this.password = new Password(passwordHash);
     }
 
-    public Exercise createCustomExercise(String name) {
+    public Exercise createCustomExercise(String name, ExerciseCategory category) {
         return Exercise.builder()
                 .name(name)
                 .isCustom(true)
                 .ownerId(this.userId)
+                .category(category)
                 .build();
     }
 

@@ -4,6 +4,7 @@ import com.gymtracker.app.domain.Exercise;
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.exception.ExerciseAlreadyExistsException;
+import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.repository.ExerciseRepository;
 import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.service.impl.ExerciseServiceImpl;
@@ -16,6 +17,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -81,5 +83,61 @@ class ExerciseServiceTest {
                 .thenReturn(true);
 
         Assertions.assertThrows(ExerciseAlreadyExistsException.class, () -> exerciseService.createCustomExercise(exercise, owner.getUserId()));
+    }
+
+    @Test
+    void givenOwnerId_whenGetUserExercisesCalled_shouldReturnUserExercises() {
+        UUID ownerId = UUID.randomUUID();
+        Set<Exercise> userExercises = Set.of(
+                Exercise.builder().name("Exercise 1").build(),
+                Exercise.builder().name("Exercise 2").build()
+        );
+
+        User owner = User.builder()
+                .exercises(userExercises)
+                .build();
+
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.of(owner));
+
+        var exercises = exerciseService.getUserExercises(ownerId);
+
+        Assertions.assertEquals(2, exercises.size());
+    }
+
+    @Test
+    void givenNonExistingOwnerId_whenGetUserExercisesCalled_shouldThrowUserDoesNotExistException() {
+        UUID ownerId = UUID.randomUUID();
+        when(userRepository.findById(ownerId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> exerciseService.getUserExercises(ownerId));
+    }
+
+    @Test
+    void givenPredefinedExercisesExist_whenGetPredefinedExercisesCalled_shouldReturnAllPredefinedExercises() {
+        Set<Exercise> predefinedExercises = Set.of(
+                Exercise.builder().name("Bench Press").isCustom(false).build(),
+                Exercise.builder().name("Squat").isCustom(false).build()
+        );
+
+        Mockito.when(exerciseRepository.findAllPredefinedExercises())
+                .thenReturn(predefinedExercises);
+
+        Set<Exercise> result = exerciseService.getPredefinedExercises();
+
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertTrue(result.stream().anyMatch(e -> e.getName().equals("Bench Press")));
+        Assertions.assertTrue(result.stream().anyMatch(e -> e.getName().equals("Squat")));
+    }
+
+    @Test
+    void givenNoPredefinedExercisesExist_whenGetPredefinedExercisesCalled_shouldReturnEmptySet() {
+        Mockito.when(exerciseRepository.findAllPredefinedExercises())
+                .thenReturn(Set.of());
+
+        Set<Exercise> result = exerciseService.getPredefinedExercises();
+
+        Assertions.assertTrue(result.isEmpty());
     }
 }

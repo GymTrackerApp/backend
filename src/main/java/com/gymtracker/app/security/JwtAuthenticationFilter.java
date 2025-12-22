@@ -7,6 +7,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-up"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-in"),
                 PathPatternRequestMatcher.withDefaults().matcher("/v3/**"),
-                PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**")
+                PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/exercises")
         );
         this.jwtService = jwtService;
     }
