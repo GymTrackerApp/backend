@@ -1,5 +1,6 @@
 package com.gymtracker.app;
 
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
@@ -100,16 +101,15 @@ class InputValidationTests {
     }
 
     @ParameterizedTest
-    @ValueSource(
-            strings = {
-                    "",
-                    "   ",
-                    "A", // Too short
-                    "!!@@##$$", // Invalid characters
-                    "ThisIsAnExcessivelyLongExerciseNameThatShouldTriggerValidationErrorsBecauseItExceedsTheMaximumAllowedLength"
-            }
-    )
-    void givenInvalidExerciseCreationRequest_whenValidated_shouldDetectRulesViolation(String exerciseName) {
+    @CsvSource(value = {
+            "'',CHEST",
+            "'   ',BACK",
+            "A,ARMS", // Too short exercise name
+            "!!@@##$$,SHOULDERS", // Invalid characters in exercise name
+            "ThisIsAnExcessivelyLongExerciseNameThatShouldTriggerValidationErrorsBecauseItExceedsTheMaximumAllowedLength,LEGS",
+            "Valid Exercise Name,", // null enum
+    })
+    void givenInvalidExerciseCreationRequest_whenValidated_shouldDetectRulesViolation(String exerciseName, ExerciseCategory category) {
         ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
                 .name(exerciseName)
                 .build();

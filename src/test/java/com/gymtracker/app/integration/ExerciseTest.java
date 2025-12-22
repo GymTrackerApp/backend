@@ -1,5 +1,6 @@
 package com.gymtracker.app.integration;
 
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.response.ExerciseDTO;
 import com.gymtracker.app.entity.ExerciseEntity;
@@ -7,6 +8,7 @@ import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.repository.jpa.SpringDataJpaExerciseRepository;
 import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,6 +52,11 @@ public class ExerciseTest {
         userRepository.deleteAll();
     }
 
+    @AfterAll
+    static void cleanContainers() {
+        postgreSQLContainer.close();
+    }
+
     @DynamicPropertySource
     public static void dynamicPropertyConfig(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
@@ -65,6 +72,7 @@ public class ExerciseTest {
     void givenNewExercise_whenCreateExercise_thenExerciseSavedInDatabase() {
         ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
                 .name("My new exercise")
+                .category(ExerciseCategory.UNCATEGORIZED)
                 .build();
 
         UserEntity user = UserEntity.builder()

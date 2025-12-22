@@ -2,6 +2,7 @@ package com.gymtracker.app.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gymtracker.app.controller.ExerciseController;
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.mapper.ExerciseMapperImpl;
 import com.gymtracker.app.security.JwtAuthenticationFilter;
@@ -45,6 +46,7 @@ class ExerciseControllerTest {
     void givenExerciseData_whenCreateCustomExerciseCalled_shouldReturnCreatedResponse() throws Exception {
         ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
                 .name("My new exercise")
+                .category(ExerciseCategory.UNCATEGORIZED)
                 .build();
 
         mockMvc.perform(MockMvcRequestBuilders.post("/exercises")
