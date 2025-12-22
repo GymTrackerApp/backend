@@ -1,6 +1,10 @@
 package com.gymtracker.app.entity;
 
+import com.gymtracker.app.domain.ExerciseCategory;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +30,9 @@ public class ExerciseEntity {
     private Long exerciseId;
     private String name;
     private boolean isCustom;
+
+    @Enumerated(EnumType.STRING)
+    private ExerciseCategory category;
 
     @ManyToOne(targetEntity = UserEntity.class)
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")

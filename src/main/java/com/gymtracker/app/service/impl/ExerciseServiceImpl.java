@@ -29,7 +29,7 @@ public class ExerciseServiceImpl implements ExerciseService {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new UserDoesNotExistException("Owner not found"));
 
-        Exercise customExercise = owner.createCustomExercise(exercise.getName());
+        Exercise customExercise = owner.createCustomExercise(exercise.getName(), exercise.getCategory());
 
         return exerciseRepository.save(customExercise);
     }

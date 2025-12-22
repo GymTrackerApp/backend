@@ -1,4 +1,6 @@
 package com.gymtracker.app.dto.response;
 
-public record ExerciseDTO(Long exerciseId, String name) {
+import com.gymtracker.app.domain.ExerciseCategory;
+
+public record ExerciseDTO(Long exerciseId, ExerciseCategory category, String name) {
 }

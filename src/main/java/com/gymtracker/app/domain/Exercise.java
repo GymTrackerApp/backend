@@ -18,4 +18,5 @@ public class Exercise {
     private String name;
     private boolean isCustom;
     private UUID ownerId;
+    private ExerciseCategory category;
 }
