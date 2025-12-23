@@ -17,13 +17,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
 @WebMvcTest(controllers = TestController.class)
 @Import({JwtAuthenticationFilter.class, JwtService.class, UtilsConfig.class, SecurityConfig.class})
-@Testcontainers
 class ProtectedEndpointTest {
     @Autowired
     private WebTestClient webTestClient;

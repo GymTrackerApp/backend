@@ -1,0 +1,60 @@
+package com.gymtracker.app.integration;
+
+import com.gymtracker.app.controller.TrainingPlanController;
+import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
+import com.gymtracker.app.security.JwtAuthenticationFilter;
+import com.gymtracker.app.service.TrainingPlanService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(controllers = TrainingPlanController.class)
+@AutoConfigureMockMvc(addFilters = false)
+class TrainingPlanControllerTest {
+    @MockitoBean
+    private TrainingPlanService trainingPlanService;
+
+    @MockitoBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Test
+    void contextLoads() {
+        Assertions.assertNotNull(mockMvc);
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenTrainingPlanData_whenCreateCustomTrainingPlanCalled_shouldReturnCreatedResponse() throws Exception {
+        TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planItems(List.of())
+                .build();
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/plans")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainingPlanCreationRequest)))
+                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+
+        Mockito.verify(trainingPlanService).generateCustomTrainingPlan(any(), any());
+    }
+}

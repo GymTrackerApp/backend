@@ -30,3 +30,6 @@ replay_pid*
 
 # env variables
 .env
+
+# iml files
+*.iml

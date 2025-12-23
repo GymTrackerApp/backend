@@ -46,8 +46,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(value = UserDoesNotExistException.class)
-    public ResponseEntity<ErrorResponse> handleUserDoesNotExistException(UserDoesNotExistException e) {
+    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(DomainException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }

@@ -42,4 +42,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "owner")
     private Set<ExerciseEntity> exercises;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<TrainingPlanEntity> plans;
 }

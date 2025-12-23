@@ -1,4 +1,4 @@
-package com.gymtracker.app.repository.jpa;
+package com.gymtracker.app.repository.jpa.exercise;
 
 import com.gymtracker.app.domain.Exercise;
 import com.gymtracker.app.entity.ExerciseEntity;
@@ -7,6 +7,7 @@ import com.gymtracker.app.repository.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -42,5 +43,11 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
         return exerciseEntities.stream()
                 .map(mapper::exerciseEntityToExercise)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Optional<Exercise> findExerciseAccessibleByUser(Long exerciseId, UUID userId) {
+        Optional<ExerciseEntity> exerciseEntity = repository.findExerciseAccessibleByUser(exerciseId, userId);
+        return exerciseEntity.map(mapper::exerciseEntityToExercise);
     }
 }

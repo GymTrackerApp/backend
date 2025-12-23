@@ -1,4 +1,4 @@
-package com.gymtracker.app.repository.jpa;
+package com.gymtracker.app.repository.jpa.user;
 
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.entity.UserEntity;
@@ -28,8 +28,8 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByIdWithoutExercises(UUID userId) {
-        return repository.findById(userId).map(userMapper::userEntityToUserWithoutExercises);
+    public Optional<User> findByIdWithoutCollections(UUID userId) {
+        return repository.findById(userId).map(userMapper::userEntityToUserWithoutCollections);
     }
 
     @Override

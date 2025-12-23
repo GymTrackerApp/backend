@@ -1,4 +1,4 @@
-package com.gymtracker.app.repository.jpa;
+package com.gymtracker.app.repository.jpa.user;
 
 import com.gymtracker.app.entity.UserEntity;
 import org.springframework.data.repository.CrudRepository;

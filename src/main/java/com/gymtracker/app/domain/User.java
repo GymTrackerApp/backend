@@ -1,5 +1,7 @@
 package com.gymtracker.app.domain;
 
+import com.gymtracker.app.exception.PlanWithSameNameAlreadyExistsException;
+import com.gymtracker.app.exception.TrainingPlansAmountExceededException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +20,8 @@ import java.util.UUID;
 @Getter
 @Setter
 public class User implements UserDetails {
+    private static final int MAX_TRAINING_PLANS_PER_USER = 5;
+
     private final UUID userId;
     private String username;
     private String email;
@@ -25,6 +29,7 @@ public class User implements UserDetails {
     @Setter(AccessLevel.NONE)
     private Password password;
     private Set<Exercise> exercises;
+    private Set<TrainingPlan> plans;
 
     public void updatePassword(String passwordHash) {
         this.password = new Password(passwordHash);
@@ -36,6 +41,26 @@ public class User implements UserDetails {
                 .isCustom(true)
                 .ownerId(this.userId)
                 .category(category)
+                .build();
+    }
+
+    public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.TrainingPlanItem> trainingPlanItems) {
+        if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
+            throw new TrainingPlansAmountExceededException("User cannot have more than " + MAX_TRAINING_PLANS_PER_USER + " training plans");
+        }
+
+        boolean planWithSameNameExists = plans.stream()
+                .anyMatch(trainingPlan -> trainingPlan.getName().equals(planName));
+
+        if (planWithSameNameExists) {
+            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+        }
+
+        return TrainingPlan.builder()
+                .name(planName)
+                .ownerId(this.userId)
+                .isCustom(true)
+                .planItems(trainingPlanItems)
                 .build();
     }
 
