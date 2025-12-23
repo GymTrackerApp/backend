@@ -7,6 +7,8 @@ import com.gymtracker.app.repository.TrainingPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
@@ -18,5 +20,12 @@ public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
         TrainingPlanEntity trainingPlanEntity = trainingPlanMapper.trainingPlanToTrainingPlanEntity(trainingPlan);
         TrainingPlanEntity savedTrainingPlanEntity = repository.save(trainingPlanEntity);
         return trainingPlanMapper.trainingPlanEntityToTrainingPlan(savedTrainingPlanEntity);
+    }
+
+    @Override
+    public List<TrainingPlan> findAllPredefinedPlans() {
+        return repository.findAllByIsCustomFalse().stream()
+                .map(trainingPlanMapper::trainingPlanEntityToTrainingPlan)
+                .toList();
     }
 }

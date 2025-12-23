@@ -1,8 +1,9 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.plans;
 
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.PlanItemEntity;
 import com.gymtracker.app.entity.TrainingPlanEntity;
+import com.gymtracker.app.integration.BaseIntegrationTest;
 import com.gymtracker.app.repository.jpa.exercise.SpringDataJpaExerciseRepository;
 import com.gymtracker.app.repository.jpa.training.SpringDataJpaTrainingPlanRepository;
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +56,40 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
 
         Iterable<TrainingPlanEntity> trainingPlanEntities = trainingPlanRepository.findAll();
         Assertions.assertNotNull(trainingPlanEntities.iterator().next());
+    }
+
+    @Test
+    void givenPredefinedTrainingPlan_whenGetAllPredefinedPlansCalled_shouldReturnThePredefinedPlan() {
+        ExerciseEntity exerciseEntity = ExerciseEntity.builder().build();
+        exerciseRepository.save(exerciseEntity);
+
+        TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
+                .name("Predefined Training Plan")
+                .isCustom(false)
+                .planItems(List.of(PlanItemEntity.builder().exercise(exerciseEntity).defaultSets(3).build()))
+                .build();
+        trainingPlanRepository.save(trainingPlanEntity);
+
+        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
+
+        Assertions.assertFalse(predefinedPlans.isEmpty());
+        Assertions.assertEquals("Predefined Training Plan", predefinedPlans.getFirst().getName());
+    }
+
+    @Test
+    void givenCustomTrainingPlan_whenGetAllPredefinedPlansCalled_shouldNotReturnTheCustomPlan() {
+        ExerciseEntity exerciseEntity = ExerciseEntity.builder().build();
+        exerciseRepository.save(exerciseEntity);
+
+        TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
+                .name("Custom Training Plan")
+                .isCustom(true)
+                .planItems(List.of(PlanItemEntity.builder().exercise(exerciseEntity).defaultSets(3).build()))
+                .build();
+        trainingPlanRepository.save(trainingPlanEntity);
+
+        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
+        Assertions.assertTrue(predefinedPlans.isEmpty());
     }
 
 }

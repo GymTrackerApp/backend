@@ -16,7 +16,7 @@ class UserTest {
     void givenExceedingMaxPlans_whenCreateCustomTrainingPlan_thenThrowException() {
         User user = User.builder()
                 .userId(UUID.randomUUID())
-                .plans(new HashSet<>())
+                .plans(new ArrayList<>())
                 .build();
 
         for (int i = 0; i < 5; i++) {
@@ -32,7 +32,7 @@ class UserTest {
     void givenDuplicatePlanName_whenCreateCustomTrainingPlan_thenThrowException() {
         User user = User.builder()
                 .userId(UUID.randomUUID())
-                .plans(new HashSet<>())
+                .plans(new ArrayList<>())
                 .build();
         user.getPlans().add(TrainingPlan.builder().name("Duplicate Plan").build());
 

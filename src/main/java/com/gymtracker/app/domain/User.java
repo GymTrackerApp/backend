@@ -29,7 +29,7 @@ public class User implements UserDetails {
     @Setter(AccessLevel.NONE)
     private Password password;
     private Set<Exercise> exercises;
-    private Set<TrainingPlan> plans;
+    private List<TrainingPlan> plans;
 
     public void updatePassword(String passwordHash) {
         this.password = new Password(passwordHash);
@@ -44,7 +44,7 @@ public class User implements UserDetails {
                 .build();
     }
 
-    public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.TrainingPlanItem> trainingPlanItems) {
+    public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.PlanItem> trainingPlanItems) {
         if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
             throw new TrainingPlansAmountExceededException("User cannot have more than " + MAX_TRAINING_PLANS_PER_USER + " training plans");
         }

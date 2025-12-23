@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface TrainingPlanService {
     TrainingPlan generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId);
+    List<TrainingPlan> getAllPredefinedTrainingPlans();
+    List<TrainingPlan> getUserTrainingPlans(UUID ownerId);
 }

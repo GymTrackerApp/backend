@@ -1,8 +1,9 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.auth;
 
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
 import com.gymtracker.app.entity.UserEntity;
+import com.gymtracker.app.integration.BaseIntegrationTest;
 import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

@@ -1,10 +1,11 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.exercise;
 
 import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.response.ExerciseDTO;
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.UserEntity;
+import com.gymtracker.app.integration.BaseIntegrationTest;
 import com.gymtracker.app.repository.jpa.exercise.SpringDataJpaExerciseRepository;
 import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ExerciseTest extends BaseIntegrationTest {
+class ExerciseIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
 

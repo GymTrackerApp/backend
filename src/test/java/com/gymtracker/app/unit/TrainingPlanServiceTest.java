@@ -1,6 +1,7 @@
 package com.gymtracker.app.unit;
 
 import com.gymtracker.app.domain.Exercise;
+import com.gymtracker.app.domain.TrainingPlan;
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import com.gymtracker.app.exception.ExerciseDoesNotExistException;
@@ -77,7 +78,7 @@ class TrainingPlanServiceTest {
     @Test
     void givenValidData_whenGenerateCustomTrainingPlanCalled_shouldReturnNonNullResponse() {
         Mockito.when(userRepository.findById(any()))
-                .thenReturn(Optional.of(User.builder().plans(Collections.emptySet()).build()));
+                .thenReturn(Optional.of(User.builder().plans(Collections.emptyList()).build()));
 
         Mockito.when(exerciseRepository.findExerciseAccessibleByUser(any(), any()))
                 .thenReturn(Optional.of(Exercise.builder().build()));
@@ -89,6 +90,52 @@ class TrainingPlanServiceTest {
         trainingPlanService.generateCustomTrainingPlan(trainingPlanCreationRequest, UUID.randomUUID());
 
         Mockito.verify(trainingPlanRepository).save(any());
+    }
+
+    @Test
+    void givenNoPredefinedTrainingPlans_whenGetAllPredefinedTrainingPlansCalled_shouldReturnEmptyList() {
+        List<?> predefinedPlans = trainingPlanService.getAllPredefinedTrainingPlans();
+
+        Assertions.assertNotNull(predefinedPlans);
+        Assertions.assertTrue(predefinedPlans.isEmpty());
+    }
+
+    @Test
+    void givenPredefinedTrainingPlans_whenGetAllPredefinedTrainingPlansCalled_shouldReturnNonEmptyList() {
+        Mockito.when(trainingPlanRepository.findAllPredefinedPlans())
+                .thenReturn(List.of());
+
+        List<?> predefinedPlans = trainingPlanService.getAllPredefinedTrainingPlans();
+
+        Assertions.assertNotNull(predefinedPlans);
+    }
+
+    @Test
+    void givenNonExistingUserId_whenGetUserTrainingPlansCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> {
+            trainingPlanService.getUserTrainingPlans(userId);
+        });
+    }
+
+    @Test
+    void givenExistingUserIdWithPlans_whenGetUserTrainingPlansCalled_shouldReturnUserPlans() {
+        UUID userId = UUID.randomUUID();
+        User user = User.builder()
+                .plans(List.of(TrainingPlan.builder().build(), TrainingPlan.builder().build()))
+                .build();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        List<?> userPlans = trainingPlanService.getUserTrainingPlans(userId);
+
+        Assertions.assertNotNull(userPlans);
+        Assertions.assertEquals(2, userPlans.size());
     }
 
     private TrainingPlanCreationRequest createEmptyTrainingPlanCreationRequest() {

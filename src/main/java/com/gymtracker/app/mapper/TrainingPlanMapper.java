@@ -1,6 +1,7 @@
 package com.gymtracker.app.mapper;
 
 import com.gymtracker.app.domain.TrainingPlan;
+import com.gymtracker.app.dto.response.TrainingPlanDTO;
 import com.gymtracker.app.entity.TrainingPlanEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -15,4 +16,6 @@ public interface TrainingPlanMapper {
     @Mapping(target = "owner.userId", source = "ownerId")
     @Mapping(target = "isCustom", source = "custom")
     TrainingPlanEntity trainingPlanToTrainingPlanEntity(TrainingPlan trainingPlan);
+
+    TrainingPlanDTO trainingPlanToTrainingPlanDTO(TrainingPlan trainingPlan);
 }

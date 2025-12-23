@@ -1,4 +1,4 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.auth;
 
 import com.gymtracker.app.TestController;
 import com.gymtracker.app.config.UtilsConfig;

@@ -14,10 +14,12 @@ import org.mapstruct.MappingTarget;
 public interface UserMapper {
     User signUpToUser(SignUp signUp);
 
+    @Mapping(target = "password", ignore = true)
     User userEntityToUser(UserEntity userEntity);
 
     @Mapping(target = "exercises", ignore = true)
     @Mapping(target = "plans", ignore = true)
+    @Mapping(target = "password", ignore = true)
     User userEntityToUserWithoutCollections(UserEntity userEntity);
 
     @AfterMapping
@@ -27,6 +29,7 @@ public interface UserMapper {
 
     @Mapping(target = "passwordHash", source = "password")
     @Mapping(target = "username", source = "displayUsername")
+    @Mapping(target = "createdAt", ignore = true)
     UserEntity userToUserEntity(User user);
 
     default Password map(String value) {

@@ -1,7 +1,8 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.plans;
 
 import com.gymtracker.app.controller.TrainingPlanController;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
+import com.gymtracker.app.mapper.TrainingPlanMapper;
 import com.gymtracker.app.security.JwtAuthenticationFilter;
 import com.gymtracker.app.service.TrainingPlanService;
 import org.junit.jupiter.api.Assertions;
@@ -26,6 +27,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(controllers = TrainingPlanController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class TrainingPlanControllerTest {
+    @MockitoBean
+    private TrainingPlanMapper trainingPlanMapper;
+
     @MockitoBean
     private TrainingPlanService trainingPlanService;
 
@@ -56,5 +60,24 @@ class TrainingPlanControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
 
         Mockito.verify(trainingPlanService).generateCustomTrainingPlan(any(), any());
+    }
+
+    @Test
+    void givenRequestToGetAllPredefinedTrainingPlans_whenGetAllPredefinedTrainingPlansCalled_shouldReturnOkResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/plans"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+
+        Mockito.verify(trainingPlanService).getAllPredefinedTrainingPlans();
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequestToGetUserTrainingPlans_whenGetUserTrainingPlansCalled_shouldReturnOkResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/plans/user"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+
+        Mockito.verify(trainingPlanService).getUserTrainingPlans(any());
     }
 }

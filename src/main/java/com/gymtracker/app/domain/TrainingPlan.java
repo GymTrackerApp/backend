@@ -17,14 +17,14 @@ public class TrainingPlan {
     private Long id;
     private String name;
     private UUID ownerId;
-    private List<TrainingPlanItem> planItems;
+    private List<PlanItem> planItems;
     private boolean isCustom;
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class TrainingPlanItem {
+    public static class PlanItem {
         private Exercise exercise;
         private int defaultSets;
     }

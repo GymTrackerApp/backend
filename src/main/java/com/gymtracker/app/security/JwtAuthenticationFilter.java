@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-in"),
                 PathPatternRequestMatcher.withDefaults().matcher("/v3/**"),
                 PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
-                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/exercises")
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/exercises"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/plans")
         );
         this.jwtService = jwtService;
     }

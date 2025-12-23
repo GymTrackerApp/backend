@@ -13,11 +13,8 @@ import com.gymtracker.app.service.TrainingPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +28,30 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot create training plan for non-existing user"));
 
-        List<TrainingPlan.TrainingPlanItem> trainingPlanItems = request.planItems()
+        List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
                 .stream()
                 .map(planItem -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
                         .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
 
-                    return new TrainingPlan.TrainingPlanItem(exercise, planItem.defaultSets());
+                    return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
                 })
                 .toList();
 
         TrainingPlan trainingPlan = user.createCustomTrainingPlan(request.planName(), trainingPlanItems);
         return trainingPlanRepository.save(trainingPlan);
+    }
+
+    @Override
+    public List<TrainingPlan> getAllPredefinedTrainingPlans() {
+        return trainingPlanRepository.findAllPredefinedPlans();
+    }
+
+    @Override
+    public List<TrainingPlan> getUserTrainingPlans(UUID ownerId) {
+        User owner = userRepository.findById(ownerId)
+                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plans for non-existing user"));
+
+        return owner.getPlans();
     }
 }
