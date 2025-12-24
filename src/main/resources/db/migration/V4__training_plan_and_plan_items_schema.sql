@@ -12,4 +12,4 @@ CREATE TABLE plan_items (
     default_sets INT,
     constraint fk_plan_items_training_plan FOREIGN KEY (training_plan_id) REFERENCES training_plans (id) ON DELETE CASCADE,
     constraint fk_plan_items_exercises FOREIGN KEY (exercise_id) REFERENCES exercises (exercise_id)
-)
+);

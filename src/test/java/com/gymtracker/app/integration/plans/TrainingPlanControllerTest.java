@@ -1,5 +1,6 @@
 package com.gymtracker.app.integration.plans;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gymtracker.app.controller.TrainingPlanController;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import com.gymtracker.app.mapper.TrainingPlanMapper;
@@ -17,7 +18,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -50,6 +50,7 @@ class TrainingPlanControllerTest {
     @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
     void givenTrainingPlanData_whenCreateCustomTrainingPlanCalled_shouldReturnCreatedResponse() throws Exception {
         TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planName("My Custom Plan")
                 .planItems(List.of())
                 .build();
 

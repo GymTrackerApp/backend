@@ -18,7 +18,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "TrainingPlans")
+@Table(name = "training_plans")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,7 +31,7 @@ public class TrainingPlanEntity {
     private String name;
 
     @ElementCollection
-    @CollectionTable(name = "PlanItems", joinColumns = @JoinColumn(name = "training_plan_id"))
+    @CollectionTable(name = "plan_items", joinColumns = @JoinColumn(name = "training_plan_id"))
     private List<PlanItemEntity> planItems;
 
     private boolean isCustom;

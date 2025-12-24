@@ -40,4 +40,18 @@ class UserTest {
             user.createCustomTrainingPlan("Duplicate Plan", new ArrayList<>());
         });
     }
+
+    @Test
+    void givenValidInput_whenCreateCustomTrainingPlan_thenCreatePlanSuccessfully() {
+        User user = User.builder()
+                .userId(UUID.randomUUID())
+                .plans(new ArrayList<>())
+                .build();
+
+        TrainingPlan newPlan = user.createCustomTrainingPlan("Unique Plan", new ArrayList<>());
+
+        assertNotNull(newPlan);
+        assertEquals("Unique Plan", newPlan.getName());
+        assertTrue(user.getPlans().contains(newPlan));
+    }
 }

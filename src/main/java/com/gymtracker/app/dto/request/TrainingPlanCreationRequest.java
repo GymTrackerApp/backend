@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 public record TrainingPlanCreationRequest(
         @NotBlank(message = "Plan name must not be blank")
+        @Size(min = 0, max = 50, message = "Plan name must not exceed 50 characters")
         String planName,
 
         @Valid

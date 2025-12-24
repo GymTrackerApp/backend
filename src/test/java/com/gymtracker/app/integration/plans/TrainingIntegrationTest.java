@@ -94,7 +94,7 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void givenInvalidExerciseId_whenCreateTrainingPlan_thenReturnsClientError() {
+    void givenInvalidExerciseId_whenCreateTrainingPlan_thenReturnsNotFound() {
         UserEntity user = UserEntity.builder()
                 .username("trainer")
                 .passwordHash("securepasswordhash")
@@ -122,7 +122,39 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
                 .bodyValue(trainingPlanCreationRequest)
                 .exchange()
                 .expectStatus()
-                .is4xxClientError();
+                .isNotFound();
+    }
+
+    @Test
+    void givenEmptyPlanName_whenCreateTrainingPlan_thenReturnsBadRequest() {
+        UserEntity user = UserEntity.builder()
+                .username("trainer")
+                .passwordHash("securepasswordhash")
+                .build();
+
+        user = userRepository.save(user);
+
+        List<TrainingPlanCreationRequest.PlanItem> planItems = List.of(
+                TrainingPlanCreationRequest.PlanItem.builder()
+                        .exerciseId(1L)
+                        .defaultSets(3)
+                        .build()
+        );
+
+        TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planName("") // Empty plan name
+                .planItems(planItems)
+                .build();
+
+        String authToken = jwtService.generateToken(user.getUsername(), user.getUserId().toString());
+
+        webTestClient.post()
+                .uri("/plans")
+                .header("Authorization", "Bearer " + authToken)
+                .bodyValue(trainingPlanCreationRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest();
     }
 
     @Test

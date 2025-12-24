@@ -12,6 +12,7 @@ import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.service.TrainingPlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     private final ExerciseRepository exerciseRepository;
 
     @Override
+    @Transactional
     public TrainingPlan generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot create training plan for non-existing user"));
@@ -48,6 +50,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<TrainingPlan> getUserTrainingPlans(UUID ownerId) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plans for non-existing user"));

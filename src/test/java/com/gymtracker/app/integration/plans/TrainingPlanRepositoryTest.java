@@ -55,7 +55,11 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
         trainingPlanRepository.save(trainingPlanEntity);
 
         Iterable<TrainingPlanEntity> trainingPlanEntities = trainingPlanRepository.findAll();
-        Assertions.assertNotNull(trainingPlanEntities.iterator().next());
+        Assertions.assertTrue(trainingPlanEntities.iterator().hasNext());
+
+        TrainingPlanEntity retrievedPlan = trainingPlanEntities.iterator().next();
+        Assertions.assertNotNull(retrievedPlan);
+        Assertions.assertEquals("My Training Plan", retrievedPlan.getName());
     }
 
     @Test

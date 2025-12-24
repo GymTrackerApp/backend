@@ -36,12 +36,16 @@ public class User implements UserDetails {
     }
 
     public Exercise createCustomExercise(String name, ExerciseCategory category) {
-        return Exercise.builder()
+        Exercise newExercise = Exercise.builder()
                 .name(name)
                 .isCustom(true)
                 .ownerId(this.userId)
                 .category(category)
                 .build();
+
+        exercises.add(newExercise);
+
+        return newExercise;
     }
 
     public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.PlanItem> trainingPlanItems) {
@@ -56,12 +60,16 @@ public class User implements UserDetails {
             throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
         }
 
-        return TrainingPlan.builder()
+        TrainingPlan newPlan = TrainingPlan.builder()
                 .name(planName)
                 .ownerId(this.userId)
                 .isCustom(true)
                 .planItems(trainingPlanItems)
                 .build();
+
+        plans.add(newPlan);
+
+        return newPlan;
     }
 
     @Override

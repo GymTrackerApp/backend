@@ -13,12 +13,13 @@ import com.gymtracker.app.service.impl.TrainingPlanServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,8 +78,10 @@ class TrainingPlanServiceTest {
 
     @Test
     void givenValidData_whenGenerateCustomTrainingPlanCalled_shouldReturnNonNullResponse() {
+        ArgumentCaptor<TrainingPlan> trainingPlanArgumentCaptor = ArgumentCaptor.forClass(TrainingPlan.class);
+
         Mockito.when(userRepository.findById(any()))
-                .thenReturn(Optional.of(User.builder().plans(Collections.emptyList()).build()));
+                .thenReturn(Optional.of(User.builder().plans(new ArrayList<>()).build()));
 
         Mockito.when(exerciseRepository.findExerciseAccessibleByUser(any(), any()))
                 .thenReturn(Optional.of(Exercise.builder().build()));
@@ -89,7 +92,11 @@ class TrainingPlanServiceTest {
 
         trainingPlanService.generateCustomTrainingPlan(trainingPlanCreationRequest, UUID.randomUUID());
 
-        Mockito.verify(trainingPlanRepository).save(any());
+        Mockito.verify(trainingPlanRepository).save(trainingPlanArgumentCaptor.capture());
+
+        TrainingPlan savedTrainingPlan = trainingPlanArgumentCaptor.getValue();
+        Assertions.assertNotNull(savedTrainingPlan);
+        Assertions.assertEquals(trainingPlanCreationRequest.planItems().size(), savedTrainingPlan.getPlanItems().size());
     }
 
     @Test

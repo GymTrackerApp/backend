@@ -6,6 +6,7 @@ import com.gymtracker.app.dto.response.MessageResponse;
 import com.gymtracker.app.dto.response.TrainingPlanDTO;
 import com.gymtracker.app.mapper.TrainingPlanMapper;
 import com.gymtracker.app.service.TrainingPlanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class TrainingPlanController {
 
     @PostMapping
     public ResponseEntity<MessageResponse> createCustomTrainingPlan(
-            @RequestBody TrainingPlanCreationRequest trainingPlanCreationRequest,
+            @Valid @RequestBody TrainingPlanCreationRequest trainingPlanCreationRequest,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         trainingPlanService.generateCustomTrainingPlan(trainingPlanCreationRequest, UUID.fromString(userDetails.getUsername()));
