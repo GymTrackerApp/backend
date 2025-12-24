@@ -1,9 +1,10 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.auth;
 
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
 import com.gymtracker.app.entity.UserEntity;
-import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
+import com.gymtracker.app.integration.BaseIntegrationTest;
+import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,21 +13,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Instant;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Testcontainers
-class UserAuthTest {
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18.1-alpine");
-
+class UserAuthTest extends BaseIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
 
@@ -35,13 +27,6 @@ class UserAuthTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @DynamicPropertySource
-    static void setTestDatabaseProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @AfterEach
     void cleanUp() {

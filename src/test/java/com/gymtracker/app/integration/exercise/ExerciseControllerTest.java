@@ -1,4 +1,4 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.exercise;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gymtracker.app.controller.ExerciseController;

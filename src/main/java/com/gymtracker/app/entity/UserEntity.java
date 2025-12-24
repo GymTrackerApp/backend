@@ -17,6 +17,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,4 +43,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "owner")
     private Set<ExerciseEntity> exercises;
+
+    @OneToMany(mappedBy = "owner")
+    private List<TrainingPlanEntity> plans;
 }

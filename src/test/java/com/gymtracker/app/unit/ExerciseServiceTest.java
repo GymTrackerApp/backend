@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -47,9 +48,7 @@ class ExerciseServiceTest {
                 .build();
 
         Mockito.when(userRepository.findById(any()))
-                .thenReturn(
-                        Optional.of(User.builder().build())
-                );
+                .thenReturn(Optional.of(User.builder().exercises(new HashSet<>()).build()));
 
         exerciseService.createCustomExercise(exercise, UUID.randomUUID());
 

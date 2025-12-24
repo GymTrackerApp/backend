@@ -1,13 +1,17 @@
 package com.gymtracker.app.exception;
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.gymtracker.app.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Arrays;
 
 @Slf4j
 @RestControllerAdvice
@@ -46,10 +50,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(value = UserDoesNotExistException.class)
-    public ResponseEntity<ErrorResponse> handleUserDoesNotExistException(UserDoesNotExistException e) {
+    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(DomainException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestBodyJson(HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
+                String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
+                ErrorResponse errorResponse = new ErrorResponse(
+                        HttpStatus.BAD_REQUEST,
+                        "Invalid enum value, choose one of: " + acceptedValues
+                );
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            }
+
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(errorResponse);
     }
 
     @ExceptionHandler(value = DomainException.class)

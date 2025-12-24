@@ -4,16 +4,20 @@ import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
+import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 class InputValidationTests {
@@ -117,5 +121,88 @@ class InputValidationTests {
         Set<ConstraintViolation<ExerciseCreationRequest>> violations = validator.validate(exerciseCreationRequest);
 
         Assertions.assertNotEquals(0, violations.size());
+    }
+
+    @Test
+    void givenInvalidTrainingPlanCreationRequest_whenValidated_shouldDetectRulesViolation() {
+        var request = TrainingPlanCreationRequest.builder()
+                .planName(" ")
+                .planItems(java.util.List.of())
+                .build();
+
+        Set<ConstraintViolation<TrainingPlanCreationRequest>> violations = validator.validate(request);
+
+        Assertions.assertNotEquals(0, violations.size());
+    }
+
+    @Test
+    void givenTrainingPlanCreationRequestWithTooManyItems_whenValidated_shouldDetectRulesViolation() {
+        var planItems = new ArrayList<TrainingPlanCreationRequest.PlanItem>();
+        for (int i = 0; i < 31; i++) {
+            planItems.add(TrainingPlanCreationRequest.PlanItem.builder()
+                    .exerciseId((long) i)
+                    .defaultSets(5)
+                    .build());
+        }
+
+        var request = TrainingPlanCreationRequest.builder()
+                .planName("Full Body Workout")
+                .planItems(planItems)
+                .build();
+
+        Set<ConstraintViolation<TrainingPlanCreationRequest>> violations = validator.validate(request);
+
+        Assertions.assertNotEquals(0, violations.size());
+    }
+
+    @Test
+    void givenTrainingPlanCreationRequestWithItemHavingTooManySets_whenValidated_shouldDetectRulesViolation() {
+        var planItem = TrainingPlanCreationRequest.PlanItem.builder()
+                .exerciseId(1L)
+                .defaultSets(100)
+                .build();
+
+        var request = TrainingPlanCreationRequest.builder()
+                .planName("Full Body Workout")
+                .planItems(List.of(planItem))
+                .build();
+
+        Set<ConstraintViolation<TrainingPlanCreationRequest>> violations = validator.validate(request);
+
+        Assertions.assertNotEquals(0, violations.size());
+    }
+
+    @Test
+    void givenTrainingPlanCreationRequestWithItemHavingNegativeSets_whenValidated_shouldDetectRulesViolation() {
+        var planItem = TrainingPlanCreationRequest.PlanItem.builder()
+                .exerciseId(1L)
+                .defaultSets(-5)
+                .build();
+
+        var request = TrainingPlanCreationRequest.builder()
+                .planName("Full Body Workout")
+                .planItems(List.of(planItem))
+                .build();
+
+        Set<ConstraintViolation<TrainingPlanCreationRequest>> violations = validator.validate(request);
+
+        Assertions.assertNotEquals(0, violations.size());
+    }
+
+    @Test
+    void givenValidTrainingPlanCreationRequest_whenValidated_shouldNotDetectRulesViolation() {
+        var planItem = TrainingPlanCreationRequest.PlanItem.builder()
+                .exerciseId(1L)
+                .defaultSets(5)
+                .build();
+
+        var request = TrainingPlanCreationRequest.builder()
+                .planName("Full Body Workout")
+                .planItems(java.util.List.of(planItem))
+                .build();
+
+        Set<ConstraintViolation<TrainingPlanCreationRequest>> violations = validator.validate(request);
+
+        Assertions.assertEquals(0, violations.size());
     }
 }

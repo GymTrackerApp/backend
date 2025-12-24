@@ -10,14 +10,17 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = ExerciseMapper.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {ExerciseMapper.class, TrainingPlanMapper.class})
 public interface UserMapper {
     User signUpToUser(SignUp signUp);
 
+    @Mapping(target = "password", ignore = true)
     User userEntityToUser(UserEntity userEntity);
 
     @Mapping(target = "exercises", ignore = true)
-    User userEntityToUserWithoutExercises(UserEntity userEntity);
+    @Mapping(target = "plans", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    User userEntityToUserWithoutCollections(UserEntity userEntity);
 
     @AfterMapping
     default void handlePasswordMapping(UserEntity userEntity, @MappingTarget User user) {
@@ -26,6 +29,7 @@ public interface UserMapper {
 
     @Mapping(target = "passwordHash", source = "password")
     @Mapping(target = "username", source = "displayUsername")
+    @Mapping(target = "createdAt", ignore = true)
     UserEntity userToUserEntity(User user);
 
     default Password map(String value) {

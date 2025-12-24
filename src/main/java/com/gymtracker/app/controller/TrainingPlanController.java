@@ -1,0 +1,67 @@
+package com.gymtracker.app.controller;
+
+import com.gymtracker.app.domain.TrainingPlan;
+import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
+import com.gymtracker.app.dto.response.MessageResponse;
+import com.gymtracker.app.dto.response.TrainingPlanDTO;
+import com.gymtracker.app.mapper.TrainingPlanMapper;
+import com.gymtracker.app.service.TrainingPlanService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/plans")
+@RequiredArgsConstructor
+public class TrainingPlanController {
+    private final TrainingPlanService trainingPlanService;
+    private final TrainingPlanMapper trainingPlanMapper;
+
+    @PostMapping
+    public ResponseEntity<MessageResponse> createCustomTrainingPlan(
+            @Valid @RequestBody TrainingPlanCreationRequest trainingPlanCreationRequest,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        trainingPlanService.generateCustomTrainingPlan(trainingPlanCreationRequest, UUID.fromString(userDetails.getUsername()));
+
+        MessageResponse response = new MessageResponse("Custom training plan created successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TrainingPlanDTO>> getAllPredefinedTrainingPlans() {
+        List<TrainingPlan> trainingPlans = trainingPlanService.getAllPredefinedTrainingPlans();
+
+        List<TrainingPlanDTO> trainingPlanDTOS = trainingPlans.stream()
+                .map(trainingPlanMapper::trainingPlanToTrainingPlanDTO)
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(trainingPlanDTOS);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<TrainingPlanDTO>> getAllUserTrainingPlans(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<TrainingPlan> trainingPlans = trainingPlanService.getUserTrainingPlans(UUID.fromString(userDetails.getUsername()));
+
+        List<TrainingPlanDTO> trainingPlanDTOS = trainingPlans.stream()
+                .map(trainingPlanMapper::trainingPlanToTrainingPlanDTO)
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(trainingPlanDTOS);
+    }
+}

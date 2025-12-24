@@ -1,36 +1,27 @@
-package com.gymtracker.app.integration;
+package com.gymtracker.app.integration.exercise;
 
 import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.dto.response.ExerciseDTO;
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.UserEntity;
-import com.gymtracker.app.repository.jpa.SpringDataJpaExerciseRepository;
-import com.gymtracker.app.repository.jpa.SpringDataJpaUserRepository;
+import com.gymtracker.app.integration.BaseIntegrationTest;
+import com.gymtracker.app.repository.jpa.exercise.SpringDataJpaExerciseRepository;
+import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
-public class ExerciseTest {
-    @Container
-    private static final PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:18.1-alpine");
-
+class ExerciseIntegrationTest extends BaseIntegrationTest {
     @Autowired
     private WebTestClient webTestClient;
 
@@ -50,18 +41,6 @@ public class ExerciseTest {
     void cleanUp() {
         exerciseRepository.deleteAll();
         userRepository.deleteAll();
-    }
-
-    @AfterAll
-    static void cleanContainers() {
-        postgreSQLContainer.close();
-    }
-
-    @DynamicPropertySource
-    public static void dynamicPropertyConfig(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
-        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
-        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
     }
 
     @Test

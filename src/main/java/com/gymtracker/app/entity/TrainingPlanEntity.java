@@ -1,10 +1,8 @@
 package com.gymtracker.app.entity;
 
-import com.gymtracker.app.domain.ExerciseCategory;
-import jakarta.persistence.Column;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,24 +15,28 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
-@Table(name = "exercises")
+@Table(name = "training_plans")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ExerciseEntity {
+public class TrainingPlanEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long exerciseId;
+    private Long id;
     private String name;
+
+    @ElementCollection
+    @CollectionTable(name = "plan_items", joinColumns = @JoinColumn(name = "training_plan_id"))
+    private List<PlanItemEntity> planItems;
+
     private boolean isCustom;
 
-    @Enumerated(EnumType.STRING)
-    private ExerciseCategory category;
-
-    @ManyToOne(targetEntity = UserEntity.class)
+    @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")
     private UserEntity owner;
 }
