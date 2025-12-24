@@ -87,6 +87,7 @@ class TrainingPlanServiceTest {
                 .thenReturn(Optional.of(Exercise.builder().build()));
 
         TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planName("Plan Name")
                 .planItems(List.of(TrainingPlanCreationRequest.PlanItem.builder().exerciseId(1L).build()))
                 .build();
 
@@ -110,11 +111,12 @@ class TrainingPlanServiceTest {
     @Test
     void givenPredefinedTrainingPlans_whenGetAllPredefinedTrainingPlansCalled_shouldReturnNonEmptyList() {
         Mockito.when(trainingPlanRepository.findAllPredefinedPlans())
-                .thenReturn(List.of());
+                .thenReturn(List.of(TrainingPlan.builder().build(), TrainingPlan.builder().build()));
 
         List<?> predefinedPlans = trainingPlanService.getAllPredefinedTrainingPlans();
 
         Assertions.assertNotNull(predefinedPlans);
+        Assertions.assertEquals(2, predefinedPlans.size());
     }
 
     @Test
