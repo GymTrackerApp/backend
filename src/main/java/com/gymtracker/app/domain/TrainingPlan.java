@@ -20,8 +20,8 @@ public class TrainingPlan {
     private List<PlanItem> planItems;
     private boolean isCustom;
 
+    @Builder
     @Getter
-    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PlanItem {
