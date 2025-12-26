@@ -1,5 +1,6 @@
 package com.gymtracker.app.domain;
 
+import com.gymtracker.app.exception.DuplicatedExercisesException;
 import com.gymtracker.app.exception.PlanWithSameNameAlreadyExistsException;
 import com.gymtracker.app.exception.TrainingPlansAmountExceededException;
 import lombok.AccessLevel;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Builder
 @AllArgsConstructor
@@ -49,6 +51,15 @@ public class User implements UserDetails {
     }
 
     public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.PlanItem> trainingPlanItems) {
+        long distinctExercisesCount = trainingPlanItems.stream()
+                .map(TrainingPlan.PlanItem::getExercise)
+                .distinct()
+                .count();
+
+        if (distinctExercisesCount != trainingPlanItems.size()) {
+            throw new DuplicatedExercisesException("Training plan items contain duplicated exercises");
+        }
+
         if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
             throw new TrainingPlansAmountExceededException("User cannot have more than " + MAX_TRAINING_PLANS_PER_USER + " training plans");
         }
