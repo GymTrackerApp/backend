@@ -43,6 +43,11 @@ public class UserRepositoryAdapter implements UserRepository {
     }
 
     @Override
+    public boolean existsById(UUID userId) {
+        return repository.existsById(userId);
+    }
+
+    @Override
     public User save(User user) {
         UserEntity userEntity = userMapper.userToUserEntity(user);
         UserEntity savedUserEntity = repository.save(userEntity);

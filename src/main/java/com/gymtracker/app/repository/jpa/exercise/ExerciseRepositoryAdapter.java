@@ -29,6 +29,11 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
     }
 
     @Override
+    public boolean existsInExercisesAccessibleByUser(Long exerciseId, UUID userId) {
+        return repository.existsByExerciseIdAndOwner_UserId(exerciseId, userId) || repository.existsByExerciseIdAndIsCustomIsFalse(exerciseId);
+    }
+
+    @Override
     public Exercise save(Exercise exercise) {
         ExerciseEntity exerciseEntity = mapper.exerciseToExerciseEntity(exercise);
 

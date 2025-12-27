@@ -9,6 +9,7 @@ import java.util.UUID;
 public interface ExerciseRepository {
     boolean existsByNameAndOwnerUserId(String name, UUID ownerId);
     boolean existsByNameAndOwnerIsNull(String name);
+    boolean existsInExercisesAccessibleByUser(Long exerciseId, UUID userId);
     Exercise save(Exercise exercise);
     Set<Exercise> findAllPredefinedExercises();
     Optional<Exercise> findExerciseAccessibleByUser(Long exerciseId, UUID userId);
