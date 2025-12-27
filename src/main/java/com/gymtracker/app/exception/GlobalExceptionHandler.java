@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.gymtracker.app.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +43,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HandlerMethodValidationException.class)
     public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
-        String errorMessage = e.getParameterValidationResults()
-                .getFirst()
-                .getResolvableErrors()
-                .getFirst()
-                .getDefaultMessage();
+        String errorMessage = e.getParameterValidationResults().stream()
+                .flatMap(parameterValidationResult -> parameterValidationResult.getResolvableErrors().stream())
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .findFirst()
+                .orElse("Validation exception occurred");
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

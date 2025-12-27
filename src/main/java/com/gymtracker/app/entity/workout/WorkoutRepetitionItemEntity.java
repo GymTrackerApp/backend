@@ -16,6 +16,8 @@ import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @DiscriminatorValue("REPS")
 public class WorkoutRepetitionItemEntity extends WorkoutItemEntity {

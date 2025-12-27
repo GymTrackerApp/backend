@@ -38,7 +38,7 @@ public class WorkoutEntity {
     private LocalDateTime createdAt;
 
     @ManyToOne
-    @JoinColumn(name = "training_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "training_id", referencedColumnName = "id")
     private TrainingPlanEntity training;
 
     @ManyToOne

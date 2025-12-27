@@ -17,6 +17,7 @@ import com.gymtracker.app.repository.WorkoutRepository;
 import com.gymtracker.app.service.WorkoutService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     private final WorkoutItemMapper workoutItemMapper;
 
     @Override
+    @Transactional
     public void createWorkout(WorkoutCreationRequest request, UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new UserDoesNotExistException("Cannot create workout for non-existing user");
