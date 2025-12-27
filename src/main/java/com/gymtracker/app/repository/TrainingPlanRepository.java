@@ -7,4 +7,5 @@ import java.util.List;
 public interface TrainingPlanRepository {
     TrainingPlan save(TrainingPlan trainingPlan);
     List<TrainingPlan> findAllPredefinedPlans();
+    boolean existsById(Long trainingId);
 }

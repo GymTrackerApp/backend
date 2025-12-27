@@ -28,4 +28,9 @@ public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
                 .map(trainingPlanMapper::trainingPlanEntityToTrainingPlan)
                 .toList();
     }
+
+    @Override
+    public boolean existsById(Long trainingId) {
+        return repository.existsById(trainingId);
+    }
 }
