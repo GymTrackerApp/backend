@@ -17,5 +17,6 @@ public interface TrainingPlanMapper {
     @Mapping(target = "isCustom", source = "custom")
     TrainingPlanEntity trainingPlanToTrainingPlanEntity(TrainingPlan trainingPlan);
 
+    @Mapping(target = "isCustom", source = "custom")
     TrainingPlanDTO trainingPlanToTrainingPlanDTO(TrainingPlan trainingPlan);
 }

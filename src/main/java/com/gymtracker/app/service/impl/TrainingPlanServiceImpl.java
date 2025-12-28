@@ -5,6 +5,7 @@ import com.gymtracker.app.domain.TrainingPlan;
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import com.gymtracker.app.exception.ExerciseDoesNotExistException;
+import com.gymtracker.app.exception.TrainingDoesNotExistException;
 import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.repository.ExerciseRepository;
 import com.gymtracker.app.repository.TrainingPlanRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -56,5 +58,21 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plans for non-existing user"));
 
         return owner.getPlans();
+    }
+
+    @Override
+    public TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId) {
+        User owner = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plan for non-existing user"));
+        List<TrainingPlan> userPlans = owner.getPlans();
+
+        Optional<TrainingPlan> trainingPlan = userPlans.stream()
+                .filter(plan -> plan.getId() == trainingPlanId)
+                .findFirst();
+
+        return trainingPlan.orElseGet(() -> getAllPredefinedTrainingPlans().stream()
+                .filter(plan -> plan.getId() == trainingPlanId)
+                .findFirst()
+                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist")));
     }
 }

@@ -10,4 +10,5 @@ public interface TrainingPlanService {
     TrainingPlan generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId);
     List<TrainingPlan> getAllPredefinedTrainingPlans();
     List<TrainingPlan> getUserTrainingPlans(UUID ownerId);
+    TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId);
 }

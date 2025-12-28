@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -81,5 +82,17 @@ class TrainingPlanControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
 
         Mockito.verify(trainingPlanService).getUserTrainingPlans(any());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequestToGetTrainingPlanById_whenGetTrainingPlanByIdCalled_shouldReturnOkResponse() throws Exception {
+        String trainingPlanId = "1";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/plans/" + trainingPlanId))
+                .andExpect(status().isOk());
+
+        Mockito.verify(trainingPlanService)
+                .getTrainingPlanById(Long.parseLong(trainingPlanId), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
     }
 }

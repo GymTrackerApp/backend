@@ -80,7 +80,7 @@ class WorkoutServiceTest {
         Mockito.when(exerciseRepository.findExerciseAccessibleByUser(workoutCreationRequest.workoutItems().getFirst().getExerciseId(), userId))
                 .thenReturn(Optional.of(Exercise.builder().build()));
 
-        Mockito.when(trainingPlanRepository.existsById(workoutCreationRequest.trainingId()))
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(workoutCreationRequest.trainingId(), userId))
                 .thenReturn(true);
 
         workoutService.createWorkout(workoutCreationRequest, userId);
@@ -140,7 +140,7 @@ class WorkoutServiceTest {
         Mockito.when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        Mockito.when(trainingPlanRepository.existsById(workoutCreationRequest.trainingId()))
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(workoutCreationRequest.trainingId(), userId))
                         .thenReturn(true);
 
         Mockito.when(exerciseRepository.findExerciseAccessibleByUser(workoutCreationRequest.workoutItems().getFirst().getExerciseId(), userId))
@@ -159,7 +159,7 @@ class WorkoutServiceTest {
         Mockito.when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        Mockito.when(trainingPlanRepository.existsById(workoutCreationRequest.trainingId()))
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(workoutCreationRequest.trainingId(), userId))
                 .thenReturn(false);
 
         Assertions.assertThrows(
@@ -190,7 +190,7 @@ class WorkoutServiceTest {
         Mockito.when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        Mockito.when(trainingPlanRepository.existsById(workoutCreationRequest.trainingId()))
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(workoutCreationRequest.trainingId(), userId))
                 .thenReturn(true);
 
         Assertions.assertThrows(DuplicatedExercisesException.class, () -> {

@@ -39,8 +39,8 @@ public class WorkoutServiceImpl implements WorkoutService {
             throw new UserDoesNotExistException("Cannot create workout for non-existing user");
         }
 
-        if (request.trainingId() != null && !trainingPlanRepository.existsById(request.trainingId())) {
-            throw new TrainingDoesNotExistException("Cannot create workout for non-existing training plan");
+        if (request.trainingId() != null && !trainingPlanRepository.existsInUserAccessiblePlans(request.trainingId(), userId)) {
+            throw new TrainingDoesNotExistException("Cannot create workout for non-accessible training plan");
         }
 
         int distinctExerciseCount = (int) request.workoutItems().stream()

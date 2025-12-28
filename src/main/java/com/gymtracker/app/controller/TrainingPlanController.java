@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,5 +64,17 @@ public class TrainingPlanController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(trainingPlanDTOS);
+    }
+
+    @GetMapping("/{planId}")
+    public ResponseEntity<TrainingPlanDTO> getTrainingPlanById(
+            @PathVariable("planId") long planId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        TrainingPlan trainingPlan = trainingPlanService.getTrainingPlanById(planId, UUID.fromString(userDetails.getUsername()));
+        TrainingPlanDTO trainingPlanDTO = trainingPlanMapper.trainingPlanToTrainingPlanDTO(trainingPlan);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(trainingPlanDTO);
     }
 }

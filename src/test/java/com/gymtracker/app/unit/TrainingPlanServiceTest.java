@@ -147,6 +147,38 @@ class TrainingPlanServiceTest {
         Assertions.assertEquals(2, userPlans.size());
     }
 
+    @Test
+    void givenNonExistingUserId_whenGetPlanTrainingByIdCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(
+                UserDoesNotExistException.class,
+                () -> trainingPlanService.getTrainingPlanById(trainingPlanId, userId)
+        );
+    }
+
+    @Test
+    void givenNonExistingTrainingPlanId_whenGetPlanTrainingByIdCalled_shouldThrowTrainingDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        User user = User.builder()
+                .plans(List.of())
+                .build();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(
+                com.gymtracker.app.exception.TrainingDoesNotExistException.class,
+                () -> trainingPlanService.getTrainingPlanById(trainingPlanId, userId)
+        );
+    }
+
     private TrainingPlanCreationRequest createEmptyTrainingPlanCreationRequest() {
         return TrainingPlanCreationRequest.builder()
                 .planItems(List.of())
