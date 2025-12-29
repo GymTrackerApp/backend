@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,15 +64,15 @@ class WorkoutControllerTest {
         List<WorkoutRepetitionItemDTO.ExerciseSet> sets = List.of(
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(10)
-                        .weight(50.0)
+                        .weight(BigDecimal.valueOf(50.0))
                         .build(),
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(8)
-                        .weight(55.0)
+                        .weight(BigDecimal.valueOf(55.0))
                         .build(),
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(6)
-                        .weight(60.0)
+                        .weight(BigDecimal.valueOf(60.0))
                         .build()
         );
 

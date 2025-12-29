@@ -29,6 +29,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -109,11 +110,11 @@ class WorkoutServiceTest {
         List<WorkoutRepetitionItemDTO.ExerciseSet> sets = List.of(
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(10)
-                        .weight(50.0)
+                        .weight(BigDecimal.valueOf(50.0))
                         .build(),
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(8)
-                        .weight(55.0)
+                        .weight(BigDecimal.valueOf(55.0))
                         .build()
         );
 

@@ -25,9 +25,9 @@ CREATE TABLE workout_items (
 );
 
 CREATE TABLE repetition_exercise_sets (
-    workout_item_id BIGSERIAL NOT NULL,
+    workout_item_id BIGINT NOT NULL,
     reps INTEGER NOT NULL,
-    weight DOUBLE PRECISION NOT NULL,
+    weight NUMERIC(6, 2) NOT NULL,
     set_order INTEGER NOT NULL,
     constraint fk_repetition_exercise_sets FOREIGN KEY (workout_item_id) REFERENCES workout_items(id) ON DELETE CASCADE
 );

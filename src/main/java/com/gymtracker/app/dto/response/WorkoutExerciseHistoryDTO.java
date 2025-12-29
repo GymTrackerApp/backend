@@ -2,6 +2,7 @@ package com.gymtracker.app.dto.response;
 
 import lombok.Builder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -12,6 +13,6 @@ public record WorkoutExerciseHistoryDTO(Long exerciseId, List<WorkoutSessionSnap
     public record WorkoutSessionSnapshot(Long workoutId, LocalDateTime workoutDate, List<SetDetail> sets) {
 
         @Builder
-        public record SetDetail(int reps, double weight) {}
+        public record SetDetail(int reps, BigDecimal weight) {}
     }
 }

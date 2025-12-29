@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -16,5 +17,5 @@ import java.util.List;
 public class WorkoutRepetitionItem extends WorkoutItem {
     private List<ExerciseSet> sets;
 
-    public record ExerciseSet(int reps, double weight) { }
+    public record ExerciseSet(int reps, BigDecimal weight) { }
 }

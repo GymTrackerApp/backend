@@ -67,11 +67,11 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
         List<TrainingPlan> userPlans = owner.getPlans();
 
         Optional<TrainingPlan> trainingPlan = userPlans.stream()
-                .filter(plan -> plan.getId() == trainingPlanId)
+                .filter(plan -> plan.getId().equals(trainingPlanId))
                 .findFirst();
 
         return trainingPlan.orElseGet(() -> getAllPredefinedTrainingPlans().stream()
-                .filter(plan -> plan.getId() == trainingPlanId)
+                .filter(plan -> plan.getId().equals(trainingPlanId))
                 .findFirst()
                 .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist")));
     }

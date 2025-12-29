@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -78,22 +79,22 @@ class WorkoutIntegrationTest extends BaseIntegrationTest {
         List<WorkoutRepetitionItemDTO.ExerciseSet> sets1 = List.of(
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(10)
-                        .weight(50.0)
+                        .weight(BigDecimal.valueOf(50.0))
                         .build(),
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(8)
-                        .weight(55.0)
+                        .weight(BigDecimal.valueOf(55.0))
                         .build()
         );
 
         List<WorkoutRepetitionItemDTO.ExerciseSet> sets2 = List.of(
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(12)
-                        .weight(60.0)
+                        .weight(BigDecimal.valueOf(60.0))
                         .build(),
                 WorkoutRepetitionItemDTO.ExerciseSet.builder()
                         .reps(10)
-                        .weight(65.0)
+                        .weight(BigDecimal.valueOf(65.0))
                         .build()
         );
 
