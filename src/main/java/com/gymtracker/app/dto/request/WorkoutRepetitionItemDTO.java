@@ -29,7 +29,7 @@ public class WorkoutRepetitionItemDTO extends WorkoutItemDTO {
 
     @Builder
     public record ExerciseSet(
-            @Positive(message = "Reps amount should be at least 1")
+            @PositiveOrZero(message = "Reps cannot be negative")
             @Max(value = MAX_REPS, message = "Reps amount cannot exceed " + MAX_REPS)
             int reps,
 

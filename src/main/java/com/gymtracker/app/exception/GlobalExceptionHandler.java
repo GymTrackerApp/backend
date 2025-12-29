@@ -5,7 +5,6 @@ import com.gymtracker.app.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSourceResolvable;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -74,6 +73,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRequestBodyJson(HttpMessageNotReadableException e) {
+        log.error("Malformed JSON request", e);
         if (e.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
                 String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
                 ErrorResponse errorResponse = new ErrorResponse(
@@ -90,6 +90,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
+        log.error("Domain exception occurred", e);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
