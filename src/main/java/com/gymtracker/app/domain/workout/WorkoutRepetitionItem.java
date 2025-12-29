@@ -20,7 +20,7 @@ public class WorkoutRepetitionItem extends WorkoutItem {
     public record ExerciseSet(int reps, BigDecimal weight) {
         public ExerciseSet {
             if (reps < 0) {
-                throw new IllegalArgumentException("Repetitions must be greater than zero");
+                throw new IllegalArgumentException("Repetitions cannot be negative");
             }
             if (weight == null) {
                 throw new IllegalArgumentException("Weight cannot be null");
