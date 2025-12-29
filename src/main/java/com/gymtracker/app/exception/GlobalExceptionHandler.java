@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.gymtracker.app.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.Arrays;
 
@@ -38,6 +40,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(value = HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        String errorMessage = e.getParameterValidationResults().stream()
+                .flatMap(parameterValidationResult -> parameterValidationResult.getResolvableErrors().stream())
+                .map(MessageSourceResolvable::getDefaultMessage)
+                .findFirst()
+                .orElse("Validation exception occurred");
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST, errorMessage));
+    }
+
     @ExceptionHandler(value = ExerciseAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleExerciseAlreadyExistsException(ExerciseAlreadyExistsException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
@@ -50,7 +65,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class})
+    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class, TrainingDoesNotExistException.class})
     public ResponseEntity<ErrorResponse> handleNotFoundException(DomainException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
@@ -58,6 +73,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRequestBodyJson(HttpMessageNotReadableException e) {
+        log.error("Malformed JSON request", e);
         if (e.getCause() instanceof InvalidFormatException ife && ife.getTargetType().isEnum()) {
                 String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
                 ErrorResponse errorResponse = new ErrorResponse(
@@ -74,6 +90,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
+        log.error("Domain exception occurred", e);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }

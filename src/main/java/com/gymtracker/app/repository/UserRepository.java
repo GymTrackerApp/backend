@@ -11,6 +11,7 @@ public interface UserRepository {
     Optional<User> findByIdWithoutCollections(UUID userId);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    boolean existsById(UUID userId);
     User save(User user);
 
 }

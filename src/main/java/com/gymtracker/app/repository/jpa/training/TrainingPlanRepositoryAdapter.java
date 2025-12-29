@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,5 +28,10 @@ public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
         return repository.findAllByIsCustomFalse().stream()
                 .map(trainingPlanMapper::trainingPlanEntityToTrainingPlan)
                 .toList();
+    }
+
+    @Override
+    public boolean existsInUserAccessiblePlans(Long trainingId, UUID userId) {
+        return repository.existsByIdAndOwnerUserId(trainingId, userId) || repository.existsByIdAndIsCustomIsFalse(trainingId);
     }
 }
