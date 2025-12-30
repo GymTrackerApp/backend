@@ -4,12 +4,14 @@ import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.response.MessageResponse;
 import com.gymtracker.app.dto.response.WorkoutExerciseHistoryDTO;
+import com.gymtracker.app.dto.response.WorkoutTrainingHistoryDTO;
 import com.gymtracker.app.mapper.WorkoutMapper;
 import com.gymtracker.app.service.WorkoutService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.jdbc.Work;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -61,5 +64,43 @@ public class WorkoutController {
         WorkoutExerciseHistoryDTO workoutExerciseHistoryDTO = workoutMapper.toWorkoutExerciseHistoryDTO(exerciseId, lastWorkoutsContainingExercise);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(workoutExerciseHistoryDTO);
+    }
+
+    @GetMapping("/exercises/{exerciseId}/history/period")
+    public ResponseEntity<WorkoutExerciseHistoryDTO> getWorkoutExerciseHistoryByWorkoutInPeriod(
+            @PathVariable("exerciseId") long exerciseId,
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<Workout> workouts = workoutService.getWorkoutExerciseHistoryByWorkoutInPeriod(
+                exerciseId,
+                startDate,
+                endDate,
+                UUID.fromString(userDetails.getUsername())
+        );
+
+        WorkoutExerciseHistoryDTO workoutExerciseHistoryDTO = workoutMapper.toWorkoutExerciseHistoryDTO(exerciseId, workouts);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(workoutExerciseHistoryDTO);
+    }
+
+    @GetMapping("/trainings/{trainingId}/history/period")
+    public ResponseEntity<WorkoutTrainingHistoryDTO> getWorkoutTrainingHistory(
+            @PathVariable("trainingId") long trainingId,
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<Workout> workouts = workoutService.getWorkoutTrainingHistory(
+                trainingId,
+                startDate,
+                endDate,
+                UUID.fromString(userDetails.getUsername())
+        );
+
+        WorkoutTrainingHistoryDTO workoutTrainingHistoryDTO = workoutMapper.toWorkoutTrainingHistoryDTO(trainingId, workouts);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(workoutTrainingHistoryDTO);
     }
 }

@@ -108,4 +108,26 @@ class WorkoutControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidParameters_whenGetWorkoutExerciseHistoryByWorkoutInPeriod_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts/exercises/{exerciseId}/history/period", 1L)
+                        .param("startDate", "2023-01-01")
+                        .param("endDate", "2023-12-31")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidParameters_whenGetWorkoutTrainingHistory_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts/trainings/{trainingId}/history/period", 1L)
+                        .param("startDate", "2023-01-01")
+                        .param("endDate", "2023-12-31")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
 }

@@ -7,6 +7,7 @@ import com.gymtracker.app.dto.request.WorkoutItemDTO;
 import com.gymtracker.app.dto.request.WorkoutRepetitionItemDTO;
 import com.gymtracker.app.exception.DuplicatedExercisesException;
 import com.gymtracker.app.exception.ExerciseDoesNotExistException;
+import com.gymtracker.app.exception.InvalidPeriodException;
 import com.gymtracker.app.exception.TrainingDoesNotExistException;
 import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.mapper.WorkoutItemMapper;
@@ -20,6 +21,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -30,6 +34,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -245,6 +250,143 @@ class WorkoutServiceTest {
         workoutService.getWorkoutExerciseHistory(exerciseId, previousWorkouts, userId);
 
         Mockito.verify(workoutRepository).findLastWorkoutsContainingExercise(exerciseId, previousWorkouts, userId);
+    }
+
+    @Test
+    void givenNonExistingUserId_whenGetWorkoutExerciseHistoryByWorkoutInPeriod_thenUserDoesNotExistExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+
+        LocalDate startDate = LocalDate.of(2000, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(false);
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> {
+            workoutService.getWorkoutExerciseHistoryByWorkoutInPeriod(
+                    exerciseId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @Test
+    void givenNonExistingExerciseId_whenGetWorkoutExerciseHistoryByWorkoutInPeriod_thenExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+
+        LocalDate startDate = LocalDate.of(2000, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        Mockito.when(exerciseRepository.existsInExercisesAccessibleByUser(exerciseId, userId))
+                .thenReturn(false);
+
+        Assertions.assertThrows(ExerciseDoesNotExistException.class, () -> {
+            workoutService.getWorkoutExerciseHistoryByWorkoutInPeriod(
+                    exerciseId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "2020-01-01, 2019-12-31",
+            ", 2020-01-01",
+            "2020-01-01,"
+    })
+    void givenInvalidPeriod_whenGetWorkoutExerciseHistoryByWorkoutInPeriod_thenInvalidPeriodExceptionIsThrown(LocalDate startDate, LocalDate endDate) {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        Mockito.when(exerciseRepository.existsInExercisesAccessibleByUser(exerciseId, userId))
+                .thenReturn(true);
+
+        Assertions.assertThrows(InvalidPeriodException.class, () -> {
+            workoutService.getWorkoutExerciseHistoryByWorkoutInPeriod(
+                    exerciseId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @Test
+    void givenNonExistingUserId_whenGetWorkoutTrainingHistory_thenUserDoesNotExistExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+        long trainingId = 1L;
+
+        LocalDate startDate = LocalDate.of(2000, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(false);
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> {
+            workoutService.getWorkoutTrainingHistory(
+                    trainingId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @Test
+    void givenNonAccessibleTrainingId_whenGetWorkoutTrainingHistory_thenTrainingDoesNotExistExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+        long trainingId = 1L;
+
+        LocalDate startDate = LocalDate.of(2000, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        Assertions.assertThrows(TrainingDoesNotExistException.class, () -> {
+            workoutService.getWorkoutTrainingHistory(
+                    trainingId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        {
+            "2020-01-01, 2019-12-31",
+            ", 2020-01-01",
+            "2020-01-01,"
+        }
+    )
+    void givenInvalidPeriod_whenGetWorkoutTrainingHistory_thenInvalidPeriodExceptionIsThrown(LocalDate startDate, LocalDate endDate) {
+        UUID userId = UUID.randomUUID();
+        long trainingId = 1L;
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(trainingId, userId))
+                .thenReturn(true);
+
+        Assertions.assertThrows(
+                InvalidPeriodException.class,
+                () -> workoutService.getWorkoutTrainingHistory(trainingId, startDate, endDate, userId)
+        );
     }
 
 }
