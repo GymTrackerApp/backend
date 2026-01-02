@@ -6,11 +6,12 @@ import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.request.WorkoutItemDTO;
 import com.gymtracker.app.dto.request.WorkoutRepetitionItemDTO;
 import com.gymtracker.app.mapper.ExerciseMapperImpl;
-import com.gymtracker.app.mapper.WorkoutItemMapper;
+import com.gymtracker.app.mapper.TrainingPlanItemMapperImpl;
+import com.gymtracker.app.mapper.TrainingPlanMapperImpl;
 import com.gymtracker.app.mapper.WorkoutItemMapperImpl;
-import com.gymtracker.app.mapper.WorkoutMapper;
 import com.gymtracker.app.mapper.WorkoutMapperImpl;
 import com.gymtracker.app.security.JwtAuthenticationFilter;
+import com.gymtracker.app.service.TrainingPlanService;
 import com.gymtracker.app.service.WorkoutService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = WorkoutController.class)
 @AutoConfigureMockMvc(addFilters = false)
-@Import({WorkoutMapperImpl.class, WorkoutItemMapperImpl.class, ExerciseMapperImpl.class})
+@Import({WorkoutMapperImpl.class, WorkoutItemMapperImpl.class, ExerciseMapperImpl.class, TrainingPlanMapperImpl.class, TrainingPlanItemMapperImpl.class})
 class WorkoutControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -44,13 +45,10 @@ class WorkoutControllerTest {
     private WorkoutService workoutService;
 
     @MockitoBean
+    private TrainingPlanService trainingPlanService;
+
+    @MockitoBean
     private JwtAuthenticationFilter jwtService;
-
-    @Autowired
-    private WorkoutMapper workoutMapper;
-
-    @Autowired
-    private WorkoutItemMapper workoutItemMapper;
 
     @Test
     void contextLoads() {
@@ -103,6 +101,37 @@ class WorkoutControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.get("/workouts/exercises/{exerciseId}/history", exerciseId)
                         .param("limit", String.valueOf(limit))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidParameters_whenGetWorkoutExerciseHistoryByWorkoutInPeriod_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts/exercises/{exerciseId}/history/period", 1L)
+                        .param("startDate", "2023-01-01")
+                        .param("endDate", "2023-12-31")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidParameters_whenGetWorkoutTrainingHistory_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts/trainings/{trainingId}/history/period", 1L)
+                        .param("startDate", "2023-01-01")
+                        .param("endDate", "2023-12-31")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequest_whenGetUserWorkoutsCalled_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());

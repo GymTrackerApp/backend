@@ -4,6 +4,7 @@ import com.gymtracker.app.domain.workout.WorkoutItem;
 import com.gymtracker.app.domain.workout.WorkoutRepetitionItem;
 import com.gymtracker.app.dto.request.WorkoutItemDTO;
 import com.gymtracker.app.dto.request.WorkoutRepetitionItemDTO;
+import com.gymtracker.app.dto.response.WorkoutDTO;
 import com.gymtracker.app.entity.workout.WorkoutItemEntity;
 import com.gymtracker.app.entity.workout.WorkoutRepetitionItemEntity;
 import org.mapstruct.Mapper;
@@ -33,4 +34,7 @@ public interface WorkoutItemMapper {
     @SubclassMapping(source = WorkoutRepetitionItemEntity.class, target = WorkoutRepetitionItem.class)
     WorkoutItem workoutItemEntityToWorkoutItem(WorkoutItemEntity workoutItemEntity);
     WorkoutRepetitionItem workoutRepetitionItemEntityToWorkoutRepetitionItem(WorkoutRepetitionItemEntity workoutRepetitionItemEntity);
+
+    @SubclassMapping(source = WorkoutRepetitionItem.class, target = WorkoutDTO.WorkoutRepetitionItemDTO.class)
+    WorkoutDTO.WorkoutItemDTO workoutItemToWorkoutItemDTO(WorkoutItem workoutItem);
 }

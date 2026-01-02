@@ -88,6 +88,13 @@ public class GlobalExceptionHandler {
                 .body(errorResponse);
     }
 
+    @ExceptionHandler(value = InvalidPeriodException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(Exception e) {
+        log.error("Bad request exception occurred", e);
+        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(value = DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
         log.error("Domain exception occurred", e);

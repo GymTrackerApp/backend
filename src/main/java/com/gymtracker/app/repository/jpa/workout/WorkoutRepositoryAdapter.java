@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,38 @@ public class WorkoutRepositoryAdapter implements WorkoutRepository {
         Pageable lastN = PageRequest.of(0, previousWorkouts);
 
         List<WorkoutEntity> workoutEntities = workoutRepository.findLastWorkoutsContainingExercise(exerciseId, userId, lastN);
+        return workoutEntities.stream()
+                .map(workoutMapper::workoutEntityToWorkout)
+                .toList();
+    }
+
+    @Override
+    public List<Workout> findWorkoutsContainingExerciseInPeriod(long exerciseId, LocalDate startDate, LocalDate endDate, UUID userId) {
+        List<WorkoutEntity> workoutEntities = workoutRepository.findWorkoutsContainingExerciseInPeriod(
+                exerciseId,
+                startDate,
+                endDate,
+                userId
+        );
+        return workoutEntities.stream()
+                .map(workoutMapper::workoutEntityToWorkout)
+                .toList();
+    }
+
+    @Override
+    public List<Workout> findWorkoutsByTrainingIdAndPeriod(long trainingId, LocalDate startDate, LocalDate endDate, UUID userId) {
+        List<WorkoutEntity> workoutEntities = workoutRepository.findWorkoutEntitiesByTraining_IdAndCreatedAtBetweenAndUser_UserId(trainingId, startDate, endDate, userId);
+        return workoutEntities.stream()
+                .map(workoutMapper::workoutEntityToWorkout)
+                .toList();
+    }
+
+    @Override
+    public List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId) {
+        List<WorkoutEntity> workoutEntities = startDate != null && endDate != null
+                ? workoutRepository.findWorkoutsByUser_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable)
+                : workoutRepository.findWorkoutsByUser_UserId(userId, pageable);
+
         return workoutEntities.stream()
                 .map(workoutMapper::workoutEntityToWorkout)
                 .toList();

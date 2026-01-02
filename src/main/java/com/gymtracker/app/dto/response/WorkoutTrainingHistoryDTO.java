@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record WorkoutExerciseHistoryDTO(Long exerciseId, List<WorkoutSessionSnapshot> history) {
+public record WorkoutTrainingHistoryDTO(Long trainingId, List<WorkoutSessionSnapshot> history) {
 }

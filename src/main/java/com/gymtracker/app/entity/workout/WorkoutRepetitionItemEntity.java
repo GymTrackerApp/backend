@@ -8,9 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OrderColumn;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder
 @Entity
 @DiscriminatorValue("REPS")
 public class WorkoutRepetitionItemEntity extends WorkoutItemEntity {
@@ -32,6 +35,7 @@ public class WorkoutRepetitionItemEntity extends WorkoutItemEntity {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class ExerciseSet {
         private int reps;
         private BigDecimal weight;
