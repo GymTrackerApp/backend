@@ -1,5 +1,6 @@
 package com.gymtracker.app.controller;
 
+import com.gymtracker.app.domain.TrainingPlan;
 import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.response.MessageResponse;
@@ -7,6 +8,7 @@ import com.gymtracker.app.dto.response.WorkoutDTO;
 import com.gymtracker.app.dto.response.WorkoutExerciseHistoryDTO;
 import com.gymtracker.app.dto.response.WorkoutTrainingHistoryDTO;
 import com.gymtracker.app.mapper.WorkoutMapper;
+import com.gymtracker.app.service.TrainingPlanService;
 import com.gymtracker.app.service.WorkoutService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -34,6 +36,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkoutController {
     private final WorkoutService workoutService;
+    private final TrainingPlanService trainingPlanService;
     private final WorkoutMapper workoutMapper;
 
     @GetMapping
@@ -45,8 +48,12 @@ public class WorkoutController {
     ) {
         List<Workout> workouts = workoutService.getWorkouts(pageable, startDate, endDate, UUID.fromString(userDetails.getUsername()));
         List<WorkoutDTO> workoutDTOS = workouts.stream()
-                .map(workoutMapper::workoutToWorkoutDTO)
+                .map(workout -> {
+                    TrainingPlan trainingPlan = trainingPlanService.getTrainingPlanById(workout.getTrainingId(), UUID.fromString(userDetails.getUsername()));
+                    return workoutMapper.workoutToWorkoutDTO(workout, trainingPlan);
+                })
                 .toList();
+
         return ResponseEntity.ok(workoutDTOS);
     }
 

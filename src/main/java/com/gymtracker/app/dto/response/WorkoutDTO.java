@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record WorkoutDTO(Long workoutId, Long trainingId, LocalDate createdAt, List<WorkoutItemDTO> workoutItems) {
+public record WorkoutDTO(Long workoutId, TrainingPlanDTO trainingPlan, LocalDate createdAt, List<WorkoutItemDTO> workoutItems) {
 
     @SuperBuilder
     @Getter
