@@ -17,6 +17,7 @@ import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.repository.WorkoutRepository;
 import com.gymtracker.app.service.WorkoutService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,6 +114,19 @@ public class WorkoutServiceImpl implements WorkoutService {
         }
 
         return workoutRepository.findWorkoutsByTrainingIdAndPeriod(trainingId, startDate, endDate, userId);
+    }
+
+    @Override
+    public List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserDoesNotExistException("Cannot get workouts for non-existing user");
+        }
+
+        if (startDate != null && endDate != null && !isPeriodValid(startDate, endDate)) {
+            throw new InvalidPeriodException("Invalid date range provided");
+        }
+
+        return workoutRepository.findUserWorkouts(pageable, startDate, endDate, userId);
     }
 
     private boolean isPeriodValid(LocalDate startDate, LocalDate endDate) {

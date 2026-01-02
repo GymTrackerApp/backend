@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -31,6 +30,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -387,6 +387,52 @@ class WorkoutServiceTest {
                 InvalidPeriodException.class,
                 () -> workoutService.getWorkoutTrainingHistory(trainingId, startDate, endDate, userId)
         );
+    }
+
+    @Test
+    void givenNonExistingUserId_whenGetWorkouts_thenUserDoesNotExistExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(false);
+
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> {
+            workoutService.getWorkouts(Pageable.ofSize(10), startDate, endDate, userId);
+        });
+    }
+
+    @Test
+    void givenNoExistingWorkouts_whenGetWorkouts_thenEmptyListIsReturned() {
+        UUID userId = UUID.randomUUID();
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        List<Workout> workouts = workoutService.getWorkouts(Pageable.ofSize(10), startDate, endDate, userId);
+
+        Assertions.assertNotNull(workouts);
+        Assertions.assertTrue(workouts.isEmpty());
+    }
+
+    @Test
+    void givenInvalidPeriod_whenGetWorkouts_thenInvalidPeriodExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+        LocalDate endDate = LocalDate.of(2019, 12, 31);
+
+        Assertions.assertThrows(InvalidPeriodException.class, () -> {
+            workoutService.getWorkouts(Pageable.ofSize(10), startDate, endDate, userId);
+        });
     }
 
 }

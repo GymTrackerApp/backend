@@ -249,4 +249,38 @@ class WorkoutIntegrationTest extends BaseIntegrationTest {
                 .jsonPath("$.history").isArray()
                 .jsonPath("$.history.length()").isEqualTo(1);
     }
+
+    @Test
+    void givenWorkoutsInDatabase_whenGetWorkouts_thenReturnsWorkouts() {
+        UserEntity userEntity = UserEntity.builder()
+                .username("listworkoutsuser")
+                .email("testuser@domain.com")
+                .passwordHash("hashedpassword")
+                .build();
+        userEntity = userRepository.save(userEntity);
+
+        TrainingPlanEntity trainingPlan = TrainingPlanEntity.builder()
+                .name("List Workouts Plan")
+                .isCustom(false)
+                .planItems(List.of())
+                .build();
+        trainingPlan = trainingPlanRepository.save(trainingPlan);
+
+        WorkoutEntity workout1 = WorkoutEntity.builder()
+                .user(userEntity)
+                .training(trainingPlan)
+                .workoutItems(List.of())
+                .build();
+        workoutRepository.save(workout1);
+
+        String token = jwtService.generateToken(userEntity.getUsername(), userEntity.getUserId().toString());
+        webTestClient.get()
+                .uri("/workouts")
+                .header("Authorization", "Bearer " + token)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.length()")
+                .isEqualTo(1);
+    }
 }

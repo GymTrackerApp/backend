@@ -1,6 +1,7 @@
 package com.gymtracker.app.repository;
 
 import com.gymtracker.app.domain.workout.Workout;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,4 +12,5 @@ public interface WorkoutRepository {
     List<Workout> findLastWorkoutsContainingExercise(long exerciseId, int previousWorkouts, UUID userId);
     List<Workout> findWorkoutsContainingExerciseInPeriod(long exerciseId, LocalDate startDate, LocalDate endDate, UUID userId);
     List<Workout> findWorkoutsByTrainingIdAndPeriod(long trainingId, LocalDate startDate, LocalDate endDate, UUID userId);
+    List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId);
 }

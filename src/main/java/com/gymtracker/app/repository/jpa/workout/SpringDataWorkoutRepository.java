@@ -31,4 +31,7 @@ public interface SpringDataWorkoutRepository extends CrudRepository<WorkoutEntit
     List<WorkoutEntity> findWorkoutsContainingExerciseInPeriod(Long exerciseId, LocalDate startDate, LocalDate endDate, UUID userId);
 
     List<WorkoutEntity> findWorkoutEntitiesByTraining_IdAndCreatedAtBetweenAndUser_UserId(Long trainingId, LocalDate startDate, LocalDate endDate, UUID userId);
+
+    List<WorkoutEntity> findWorkoutsByUser_UserId(UUID userId, Pageable pageable);
+    List<WorkoutEntity> findWorkoutsByUser_UserIdAndCreatedAtBetween(UUID userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package com.gymtracker.app.controller;
 import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.response.MessageResponse;
+import com.gymtracker.app.dto.response.WorkoutDTO;
 import com.gymtracker.app.dto.response.WorkoutExerciseHistoryDTO;
 import com.gymtracker.app.dto.response.WorkoutTrainingHistoryDTO;
 import com.gymtracker.app.mapper.WorkoutMapper;
@@ -11,7 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.jdbc.Work;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,6 +35,20 @@ import java.util.UUID;
 public class WorkoutController {
     private final WorkoutService workoutService;
     private final WorkoutMapper workoutMapper;
+
+    @GetMapping
+    public ResponseEntity<List<WorkoutDTO>> getWorkouts(
+            Pageable pageable,
+            @RequestParam(name = "startDate", required = false) LocalDate startDate,
+            @RequestParam(name = "endDate", required = false) LocalDate endDate,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        List<Workout> workouts = workoutService.getWorkouts(pageable, startDate, endDate, UUID.fromString(userDetails.getUsername()));
+        List<WorkoutDTO> workoutDTOS = workouts.stream()
+                .map(workoutMapper::workoutToWorkoutDTO)
+                .toList();
+        return ResponseEntity.ok(workoutDTOS);
+    }
 
     @PostMapping
     public ResponseEntity<MessageResponse> createWorkout(

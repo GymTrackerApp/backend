@@ -4,6 +4,7 @@ import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.domain.workout.WorkoutItem;
 import com.gymtracker.app.domain.workout.WorkoutRepetitionItem;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
+import com.gymtracker.app.dto.response.WorkoutDTO;
 import com.gymtracker.app.dto.response.WorkoutExerciseHistoryDTO;
 import com.gymtracker.app.dto.response.WorkoutSessionSnapshot;
 import com.gymtracker.app.dto.response.WorkoutTrainingHistoryDTO;
@@ -29,6 +30,9 @@ public interface WorkoutMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "userId", ignore = true)
     Workout workoutCreationRequestToWorkout(WorkoutCreationRequest workoutCreationRequest);
+
+    @Mapping(target = "workoutId", source = "id")
+    WorkoutDTO workoutToWorkoutDTO(Workout workout);
 
     default WorkoutExerciseHistoryDTO toWorkoutExerciseHistoryDTO(Long exerciseId, List<Workout> workouts) {
         return WorkoutExerciseHistoryDTO.builder()

@@ -130,4 +130,13 @@ class WorkoutControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
 
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequest_whenGetUserWorkoutsCalled_shouldReturnOkStatus() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/workouts")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
+    }
+
 }

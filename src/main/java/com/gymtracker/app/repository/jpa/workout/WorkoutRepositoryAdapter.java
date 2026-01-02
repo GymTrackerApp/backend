@@ -56,4 +56,15 @@ public class WorkoutRepositoryAdapter implements WorkoutRepository {
                 .map(workoutMapper::workoutEntityToWorkout)
                 .toList();
     }
+
+    @Override
+    public List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId) {
+        List<WorkoutEntity> workoutEntities = startDate != null && endDate != null
+                ? workoutRepository.findWorkoutsByUser_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable)
+                : workoutRepository.findWorkoutsByUser_UserId(userId, pageable);
+
+        return workoutEntities.stream()
+                .map(workoutMapper::workoutEntityToWorkout)
+                .toList();
+    }
 }

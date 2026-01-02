@@ -4,7 +4,7 @@ import com.gymtracker.app.exception.DomainException;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +14,7 @@ public class Workout {
     private Long id;
     private UUID userId;
     private Long trainingId;
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
     private List<WorkoutItem> workoutItems;
 
     public static Workout create(UUID userId, Long trainingId, List<WorkoutItem> workoutItems) {
