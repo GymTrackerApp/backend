@@ -27,7 +27,7 @@ public class WorkoutRepetitionItemDTO extends WorkoutItemDTO {
 
     @Valid
     @NotNull(message = "Sets information should be provided")
-    @Size(min = 1, max = MAX_SETS, message = "Number of sets cannot exceed " + MAX_SETS)
+    @Size(min = 1, max = MAX_SETS, message = "Sets amount must be between {min} and {max} for each exercise")
     private List<ExerciseSet> sets;
 
     @Builder
