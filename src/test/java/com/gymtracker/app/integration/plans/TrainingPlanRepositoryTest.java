@@ -1,5 +1,6 @@
 package com.gymtracker.app.integration.plans;
 
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.PlanItemEntity;
 import com.gymtracker.app.entity.TrainingPlanEntity;
@@ -31,7 +32,7 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
         TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
                 .name("My Training Plan")
                 .isCustom(false)
-                .planItems(List.of(PlanItemEntity.builder().exercise(ExerciseEntity.builder().build()).defaultSets(3).build()))
+                .planItems(List.of(PlanItemEntity.builder().exercise(createTestExerciseEntity()).build()))
                 .build();
 
         TrainingPlanEntity savedTrainingPlanEntity = trainingPlanRepository.save(trainingPlanEntity);
@@ -43,7 +44,9 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
 
     @Test
     void givenValidData_whenGetMethodCalled_shouldGetAllTrainingPlans() {
-        ExerciseEntity exerciseEntity = ExerciseEntity.builder().build();
+        trainingPlanRepository.deleteAll();
+
+        ExerciseEntity exerciseEntity = createTestExerciseEntity();
         exerciseRepository.save(exerciseEntity);
 
         TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
@@ -64,7 +67,7 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
 
     @Test
     void givenPredefinedTrainingPlan_whenGetAllPredefinedPlansCalled_shouldReturnThePredefinedPlan() {
-        ExerciseEntity exerciseEntity = ExerciseEntity.builder().build();
+        ExerciseEntity exerciseEntity = createTestExerciseEntity();
         exerciseRepository.save(exerciseEntity);
 
         TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
@@ -77,12 +80,16 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
         List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
 
         Assertions.assertFalse(predefinedPlans.isEmpty());
-        Assertions.assertEquals("Predefined Training Plan", predefinedPlans.getFirst().getName());
+        Assertions.assertTrue(predefinedPlans.stream()
+                .anyMatch(tpe -> tpe.getName().equals(trainingPlanEntity.getName()))
+        );
     }
 
     @Test
     void givenCustomTrainingPlan_whenGetAllPredefinedPlansCalled_shouldNotReturnTheCustomPlan() {
-        ExerciseEntity exerciseEntity = ExerciseEntity.builder().build();
+        trainingPlanRepository.deleteAll();
+
+        ExerciseEntity exerciseEntity = createTestExerciseEntity();
         exerciseRepository.save(exerciseEntity);
 
         TrainingPlanEntity trainingPlanEntity = TrainingPlanEntity.builder()
@@ -94,6 +101,14 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
 
         List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
         Assertions.assertTrue(predefinedPlans.isEmpty());
+    }
+
+    private ExerciseEntity createTestExerciseEntity() {
+        return ExerciseEntity.builder()
+                .name("Test Exercise")
+                .isCustom(true)
+                .category(ExerciseCategory.UNCATEGORIZED)
+                .build();
     }
 
 }

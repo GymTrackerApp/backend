@@ -1,9 +1,12 @@
 package com.gymtracker.app.integration.auth;
 
+import com.gymtracker.app.dto.request.RefreshTokenRequest;
 import com.gymtracker.app.dto.request.SignIn;
 import com.gymtracker.app.dto.request.SignUp;
+import com.gymtracker.app.entity.RefreshTokenEntity;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.integration.BaseIntegrationTest;
+import com.gymtracker.app.repository.jpa.token.SpringDataJpaRefreshTokenRepository;
 import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -15,7 +18,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.HexFormat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class UserAuthTest extends BaseIntegrationTest {
@@ -27,6 +35,9 @@ class UserAuthTest extends BaseIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SpringDataJpaRefreshTokenRepository refreshTokenRepository;
 
     @AfterEach
     void cleanUp() {
@@ -86,7 +97,7 @@ class UserAuthTest extends BaseIntegrationTest {
     }
 
     @Test
-    void givenValidUserDetails_whenLoggingUser_thenReturnsToken() {
+    void givenValidUserDetails_whenLoggingUser_thenReturnsAccessAndRefreshTokens() {
         String plainPassword = "testuser123";
         String hashedPassword = passwordEncoder.encode(plainPassword);
 
@@ -111,7 +122,55 @@ class UserAuthTest extends BaseIntegrationTest {
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.token")
-                .exists();
+                .jsonPath("$.accessToken").exists()
+                .jsonPath("$.refreshToken").exists();
+    }
+
+    @Test
+    void givenRefreshTokenRequest_whenRefreshingToken_thenReturnsNewAccessToken() {
+        UserEntity user = UserEntity.builder()
+                .username("testuser")
+                .email("testuser@domain.com")
+                .passwordHash(passwordEncoder.encode("testuser123"))
+                .createdAt(Instant.now())
+                .build();
+
+        user = userRepository.save(user);
+
+        RefreshTokenRequest refreshTokenRequest = new RefreshTokenRequest("some-refresh-token");
+
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                .tokenHash(hashToken(refreshTokenRequest.refreshToken()))
+                .revoked(false)
+                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+                .user(user)
+                .build();
+
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        webTestClient.post()
+                .uri("/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(refreshTokenRequest)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.accessToken").exists()
+                .jsonPath("$.refreshToken").exists();
+
+        Assertions.assertTrue(refreshTokenRepository.findAll().iterator().hasNext());
+        RefreshTokenEntity storedToken = refreshTokenRepository.findAll().iterator().next();
+        Assertions.assertNotEquals(refreshTokenEntity.getTokenHash(), storedToken.getTokenHash());
+    }
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashedBytes = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(hashedBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing token", e);
+        }
     }
 }

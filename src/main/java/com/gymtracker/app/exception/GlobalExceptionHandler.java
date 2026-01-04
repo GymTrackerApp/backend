@@ -19,8 +19,8 @@ import java.util.Arrays;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = SignInException.class)
-    public ResponseEntity<ErrorResponse> handleSignInException(SignInException e) {
+    @ExceptionHandler(value = {SignInException.class, SessionExpiredException.class})
+    public ResponseEntity<ErrorResponse> handleSignInException(RuntimeException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }

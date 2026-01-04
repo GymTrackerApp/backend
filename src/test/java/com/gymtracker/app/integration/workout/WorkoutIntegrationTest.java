@@ -1,5 +1,6 @@
 package com.gymtracker.app.integration.workout;
 
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.request.WorkoutItemDTO;
 import com.gymtracker.app.dto.request.WorkoutRepetitionItemDTO;
@@ -7,7 +8,6 @@ import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.TrainingPlanEntity;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.entity.workout.WorkoutEntity;
-import com.gymtracker.app.entity.workout.WorkoutItemEntity;
 import com.gymtracker.app.entity.workout.WorkoutRepetitionItemEntity;
 import com.gymtracker.app.integration.BaseIntegrationTest;
 import com.gymtracker.app.repository.jpa.exercise.SpringDataJpaExerciseRepository;
@@ -20,8 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.auditing.DateTimeProvider;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
@@ -72,9 +70,11 @@ class WorkoutIntegrationTest extends BaseIntegrationTest {
 
         ExerciseEntity exercise1 = ExerciseEntity.builder()
                 .name("Bench Press")
+                .category(ExerciseCategory.CHEST)
                 .build();
 
         ExerciseEntity exercise2 = ExerciseEntity.builder()
+                .category(ExerciseCategory.LEGS)
                 .name("Squat")
                 .build();
 
@@ -155,6 +155,7 @@ class WorkoutIntegrationTest extends BaseIntegrationTest {
 
         ExerciseEntity exercise = ExerciseEntity.builder()
                 .name("Deadlift")
+                .category(ExerciseCategory.GENERAL)
                 .build();
         exercise = exerciseRepository.save(exercise);
 
