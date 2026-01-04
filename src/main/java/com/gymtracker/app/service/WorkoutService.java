@@ -13,5 +13,5 @@ public interface WorkoutService {
     List<Workout> getWorkoutExerciseHistory(long exerciseId, int previousWorkouts, UUID userId);
     List<Workout> getWorkoutExerciseHistoryByWorkoutInPeriod(long exerciseId, LocalDate startDate, LocalDate endDate, UUID userId);
     List<Workout> getWorkoutTrainingHistory(long trainingId, LocalDate startDate, LocalDate endDate, UUID userId);
-    List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId);
+    List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, Long trainingPlanId, UUID userId);
 }

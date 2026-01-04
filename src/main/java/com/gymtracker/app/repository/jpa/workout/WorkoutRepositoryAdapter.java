@@ -7,6 +7,7 @@ import com.gymtracker.app.repository.WorkoutRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -58,10 +59,9 @@ public class WorkoutRepositoryAdapter implements WorkoutRepository {
     }
 
     @Override
-    public List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId) {
-        List<WorkoutEntity> workoutEntities = startDate != null && endDate != null
-                ? workoutRepository.findWorkoutsByUser_UserIdAndCreatedAtBetween(userId, startDate, endDate, pageable)
-                : workoutRepository.findWorkoutsByUser_UserId(userId, pageable);
+    public List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, Long trainingPlanId, UUID userId) {
+        Specification<WorkoutEntity> specifications = WorkoutSpecifications.filterWorkouts(trainingPlanId, startDate, endDate, userId);
+        List<WorkoutEntity> workoutEntities = workoutRepository.findAll(specifications, pageable).getContent();
 
         return workoutEntities.stream()
                 .map(workoutMapper::workoutEntityToWorkout)

@@ -27,18 +27,18 @@ public class WorkoutRepetitionItemDTO extends WorkoutItemDTO {
 
     @Valid
     @NotNull(message = "Sets information should be provided")
-    @Size(min = 1, max = MAX_SETS, message = "Number of sets cannot exceed " + MAX_SETS)
+    @Size(min = 1, max = MAX_SETS, message = "Sets amount must be between {min} and {max} for each exercise")
     private List<ExerciseSet> sets;
 
     @Builder
     public record ExerciseSet(
             @NotNull(message = "Sets amount must be provided")
             @PositiveOrZero(message = "Reps cannot be negative")
-            @Max(value = MAX_REPS, message = "Reps amount cannot exceed " + MAX_REPS)
+            @Max(value = MAX_REPS, message = "Reps amount cannot exceed {value}")
             int reps,
 
             @NotNull(message = "Weight must be provided")
             @PositiveOrZero(message = "Weight cannot be negative")
-            @Max(value = MAX_WEIGHT, message = "Weight cannot exceed " + MAX_WEIGHT + " kg")
+            @Max(value = MAX_WEIGHT, message = "Weight cannot exceed {value} kg")
             BigDecimal weight) {}
 }

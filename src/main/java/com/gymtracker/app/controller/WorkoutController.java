@@ -44,9 +44,10 @@ public class WorkoutController {
             Pageable pageable,
             @RequestParam(name = "startDate", required = false) LocalDate startDate,
             @RequestParam(name = "endDate", required = false) LocalDate endDate,
+            @RequestParam(name = "trainingPlanId", required = false) Long trainingPlanId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        List<Workout> workouts = workoutService.getWorkouts(pageable, startDate, endDate, UUID.fromString(userDetails.getUsername()));
+        List<Workout> workouts = workoutService.getWorkouts(pageable, startDate, endDate, trainingPlanId, UUID.fromString(userDetails.getUsername()));
         List<WorkoutDTO> workoutDTOS = workouts.stream()
                 .map(workout -> {
                     TrainingPlan trainingPlan = trainingPlanService.getTrainingPlanById(workout.getTrainingId(), UUID.fromString(userDetails.getUsername()));

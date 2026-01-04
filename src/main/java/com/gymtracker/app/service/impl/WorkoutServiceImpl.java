@@ -117,7 +117,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, UUID userId) {
+    public List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, Long trainingPlanId, UUID userId) {
         if (!userRepository.existsById(userId)) {
             throw new UserDoesNotExistException("Cannot get workouts for non-existing user");
         }
@@ -126,7 +126,11 @@ public class WorkoutServiceImpl implements WorkoutService {
             throw new InvalidPeriodException("Invalid date range provided");
         }
 
-        return workoutRepository.findUserWorkouts(pageable, startDate, endDate, userId);
+        if (trainingPlanId != null && !trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId)) {
+            throw new TrainingDoesNotExistException("Cannot get workouts for non-existing training plan");
+        }
+
+        return workoutRepository.findUserWorkouts(pageable, startDate, endDate, trainingPlanId, userId);
     }
 
     private boolean isPeriodValid(LocalDate startDate, LocalDate endDate) {
