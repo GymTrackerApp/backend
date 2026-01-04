@@ -4,7 +4,6 @@ import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.entity.workout.WorkoutEntity;
 import com.gymtracker.app.mapper.WorkoutMapper;
 import com.gymtracker.app.repository.WorkoutRepository;
-import com.gymtracker.app.repository.WorkoutSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -61,8 +60,8 @@ public class WorkoutRepositoryAdapter implements WorkoutRepository {
 
     @Override
     public List<Workout> findUserWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, Long trainingPlanId, UUID userId) {
-        Specification<WorkoutEntity> specifications = WorkoutSpecifications.filterWorkouts(trainingPlanId, startDate, endDate);
-        List<WorkoutEntity> workoutEntities = workoutRepository.findAll(specifications, pageable).stream().toList();
+        Specification<WorkoutEntity> specifications = WorkoutSpecifications.filterWorkouts(trainingPlanId, startDate, endDate, userId);
+        List<WorkoutEntity> workoutEntities = workoutRepository.findAll(specifications, pageable).getContent();
 
         return workoutEntities.stream()
                 .map(workoutMapper::workoutEntityToWorkout)

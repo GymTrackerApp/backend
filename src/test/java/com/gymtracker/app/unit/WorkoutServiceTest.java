@@ -410,16 +410,15 @@ class WorkoutServiceTest {
     @Test
     void givenNoExistingWorkouts_whenGetWorkouts_thenEmptyListIsReturned() {
         UUID userId = UUID.randomUUID();
+        Long trainingPlanId = 1L;
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
 
         Mockito.when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(any(), any()))
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId))
                 .thenReturn(true);
-
-        LocalDate startDate = LocalDate.of(2020, 1, 1);
-        LocalDate endDate = LocalDate.of(2020, 2, 1);
-        Long trainingPlanId = 1L;
 
         List<Workout> workouts = workoutService.getWorkouts(Pageable.ofSize(10), startDate, endDate, trainingPlanId, userId);
 
@@ -446,13 +445,15 @@ class WorkoutServiceTest {
     @Test
     void givenNonExistingTrainingPlanId_whenGetWorkouts_thenTrainingDoesNotExistExceptionIsThrown() {
         UUID userId = UUID.randomUUID();
+        LocalDate startDate = LocalDate.of(2020, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+        Long trainingPlanId = 1L;
 
         Mockito.when(userRepository.existsById(userId))
                 .thenReturn(true);
 
-        LocalDate startDate = LocalDate.of(2020, 1, 1);
-        LocalDate endDate = LocalDate.of(2020, 2, 1);
-        Long trainingPlanId = 1L;
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId))
+                        .thenReturn(false);
 
         Assertions.assertThrows(TrainingDoesNotExistException.class, () -> {
             workoutService.getWorkouts(Pageable.ofSize(10), startDate, endDate, trainingPlanId, userId);
