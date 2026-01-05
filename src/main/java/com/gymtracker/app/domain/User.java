@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class User implements UserDetails {
     private final UUID userId;
     private String username;
     private String email;
+    private Instant createdAt;
 
     @Setter(AccessLevel.NONE)
     private Password password;
