@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TrainingPlanService {
-    TrainingPlan generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId);
+    void generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId);
     List<TrainingPlan> getAllPredefinedTrainingPlans();
     List<TrainingPlan> getUserTrainingPlans(UUID ownerId);
     TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId);
+    void deleteTrainingPlan(long planId, UUID userId);
+    void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId);
 }
