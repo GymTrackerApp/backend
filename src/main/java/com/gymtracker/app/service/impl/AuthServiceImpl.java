@@ -66,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
+    @Transactional(noRollbackFor = SessionExpiredException.class)
     public RefreshTokenResponse refreshToken(String refreshToken) {
         RefreshToken refreshTokenDomain = refreshTokenRepository.getHashedRefreshToken(hashToken(refreshToken))
                 .orElseThrow(() -> new SessionExpiredException("Session not found"));
