@@ -99,4 +99,13 @@ class AuthServiceTest {
         Mockito.verify(jwtService).generateToken(any(), any());
         Assertions.assertNotNull(response.refreshToken());
     }
+
+    @Test
+    void givenValidRefreshToken_whenSignOutCalled_shouldDeleteRefreshToken() {
+        String refreshToken = "some-refresh-token";
+
+        authService.signOut(refreshToken);
+
+        Mockito.verify(refreshTokenRepository).deleteByTokenHash(any());
+    }
 }

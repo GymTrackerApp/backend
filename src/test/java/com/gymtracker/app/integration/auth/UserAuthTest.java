@@ -164,6 +164,36 @@ class UserAuthTest extends BaseIntegrationTest {
         Assertions.assertNotEquals(refreshTokenEntity.getTokenHash(), storedToken.getTokenHash());
     }
 
+    @Test
+    void givenValidRefreshToken_whenLoggingOut_thenRemovesRefreshToken() {
+        UserEntity user = UserEntity.builder()
+                .username("testuser")
+                .email("testuser@domain.com")
+                .passwordHash(passwordEncoder.encode("testuser123"))
+                .createdAt(Instant.now())
+                .build();
+        user = userRepository.save(user);
+
+        String rawRefreshToken = "some-refresh-token";
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                .tokenHash(hashToken(rawRefreshToken))
+                .revoked(false)
+                .expiresAt(Instant.now().plus(1, ChronoUnit.DAYS))
+                .user(user)
+                .build();
+        refreshTokenRepository.save(refreshTokenEntity);
+
+        webTestClient.post()
+                .uri("/auth/sign-out")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new RefreshTokenRequest(rawRefreshToken))
+                .exchange()
+                .expectStatus()
+                .isOk();
+
+        Assertions.assertFalse(refreshTokenRepository.findAll().iterator().hasNext());
+    }
+
     private String hashToken(String rawToken) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");

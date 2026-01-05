@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-up"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-in"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/refresh"),
+                PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-out"),
                 PathPatternRequestMatcher.withDefaults().matcher("/v3/**"),
                 PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"),
                 PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/exercises"),

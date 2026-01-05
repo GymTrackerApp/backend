@@ -10,4 +10,5 @@ public interface RefreshTokenRepository {
     void createRefreshToken(String refreshTokenHash, User user);
     Optional<RefreshToken> getHashedRefreshToken(String hashedRefreshToken);
     void deleteById(UUID refreshTokenId);
+    void deleteByTokenHash(String tokenHash);
 }

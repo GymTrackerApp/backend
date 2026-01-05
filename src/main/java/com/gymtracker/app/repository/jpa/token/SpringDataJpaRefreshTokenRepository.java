@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface SpringDataJpaRefreshTokenRepository extends CrudRepository<RefreshTokenEntity, UUID> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<RefreshTokenEntity> getRefreshTokenEntityByTokenHash(String tokenHash);
+    void deleteByTokenHash(String tokenHash);
 }
