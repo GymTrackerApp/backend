@@ -19,8 +19,8 @@ import java.util.Arrays;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(value = SignInException.class)
-    public ResponseEntity<ErrorResponse> handleSignInException(SignInException e) {
+    @ExceptionHandler(value = {SignInException.class, SessionExpiredException.class})
+    public ResponseEntity<ErrorResponse> handleSignInException(RuntimeException e) {
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
                 String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
                 ErrorResponse errorResponse = new ErrorResponse(
                         HttpStatus.BAD_REQUEST,
-                        "Invalid enum value, choose one of: " + acceptedValues
+                        "Invalid category value, choose one of: " + acceptedValues
                 );
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }

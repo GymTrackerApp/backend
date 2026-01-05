@@ -7,6 +7,7 @@ import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.integration.BaseIntegrationTest;
 import com.gymtracker.app.repository.jpa.exercise.SpringDataJpaExerciseRepository;
+import com.gymtracker.app.repository.jpa.training.SpringDataJpaTrainingPlanRepository;
 import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
@@ -17,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,9 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
     private SpringDataJpaUserRepository userRepository;
 
     @Autowired
+    private SpringDataJpaTrainingPlanRepository planRepository;
+
+    @Autowired
     private JwtService jwtService;
 
     @Autowired
@@ -39,6 +44,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
 
     @AfterEach
     void cleanUp() {
+        planRepository.deleteAll();
         exerciseRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -54,10 +60,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
                 .category(ExerciseCategory.UNCATEGORIZED)
                 .build();
 
-        UserEntity user = UserEntity.builder()
-                .username("testuser")
-                .passwordHash(passwordEncoder.encode("testpassword123@"))
-                .build();
+        UserEntity user = createTestUserEntity();
 
         UserEntity savedUser = userRepository.save(user);
 
@@ -79,10 +82,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenExistingUser_whenGetUserExercisesCalled_thenShouldRetrieveOnlyUserExercises() {
-        UserEntity user = UserEntity.builder()
-                .username("testuser")
-                .passwordHash(passwordEncoder.encode("testpassword123@"))
-                .build();
+        UserEntity user = createTestUserEntity();
         UserEntity savedUser = userRepository.save(user);
 
         List<ExerciseEntity> userExercises = new ArrayList<>();
@@ -91,6 +91,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
             ExerciseEntity exercise = ExerciseEntity.builder()
                     .name("User Exercise " + i)
                     .isCustom(true)
+                    .category(ExerciseCategory.UNCATEGORIZED)
                     .owner(savedUser)
                     .build();
             userExercises.add(exercise);
@@ -100,6 +101,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
             ExerciseEntity exercise = ExerciseEntity.builder()
                     .name("Predefined Exercise " + i)
                     .isCustom(false)
+                    .category(ExerciseCategory.UNCATEGORIZED)
                     .build();
             exerciseRepository.save(exercise);
         }
@@ -126,6 +128,7 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
             ExerciseEntity exercise = ExerciseEntity.builder()
                     .name("Predefined Exercise " + i)
                     .isCustom(false)
+                    .category(ExerciseCategory.UNCATEGORIZED)
                     .build();
             predefinedExercises.add(exercise);
         }
@@ -139,5 +142,14 @@ class ExerciseIntegrationTest extends BaseIntegrationTest {
                 .isOk()
                 .expectBodyList(ExerciseDTO.class)
                 .hasSize(predefinedExercises.size());
+    }
+
+    private UserEntity createTestUserEntity() {
+        return UserEntity.builder()
+                .username("testuser")
+                .email("testuser@domain.com")
+                .createdAt(Instant.now())
+                .passwordHash(passwordEncoder.encode("testpassword123@"))
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.gymtracker.app.integration.plans;
 
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import com.gymtracker.app.entity.ExerciseEntity;
 import com.gymtracker.app.entity.PlanItemEntity;
@@ -12,6 +13,7 @@ import com.gymtracker.app.repository.jpa.user.SpringDataJpaUserRepository;
 import com.gymtracker.app.security.JwtService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,6 +43,7 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
     }
 
     @AfterEach
+    @BeforeEach
     void cleanUp() {
         trainingPlanRepository.deleteAll();
         exerciseRepository.deleteAll();
@@ -49,17 +52,13 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenValidTrainingPlan_whenCreateTrainingPlan_thenTrainingPlanSavedInDatabase() {
-        ExerciseEntity exercise1 = ExerciseEntity.builder().name("Exercise 1").build();
-        ExerciseEntity exercise2 = ExerciseEntity.builder().name("Exercise 2").build();
+        ExerciseEntity exercise1 = createTestExerciseEntity("Exercise 1");
+        ExerciseEntity exercise2 = createTestExerciseEntity("Exercise 2");
 
         exercise1 = exerciseRepository.save(exercise1);
         exercise2 = exerciseRepository.save(exercise2);
 
-        UserEntity user = UserEntity.builder()
-                .username("trainer")
-                .passwordHash("securepasswordhash")
-                .build();
-
+        UserEntity user = createTestUserEntity();
         user = userRepository.save(user);
 
         List<TrainingPlanCreationRequest.PlanItem> planItems = List.of(
@@ -95,11 +94,7 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenInvalidExerciseId_whenCreateTrainingPlan_thenReturnsNotFound() {
-        UserEntity user = UserEntity.builder()
-                .username("trainer")
-                .passwordHash("securepasswordhash")
-                .build();
-
+        UserEntity user = createTestUserEntity();
         user = userRepository.save(user);
 
         List<TrainingPlanCreationRequest.PlanItem> planItems = List.of(
@@ -127,11 +122,7 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenEmptyPlanName_whenCreateTrainingPlan_thenReturnsBadRequest() {
-        UserEntity user = UserEntity.builder()
-                .username("trainer")
-                .passwordHash("securepasswordhash")
-                .build();
-
+        UserEntity user = createTestUserEntity();
         user = userRepository.save(user);
 
         List<TrainingPlanCreationRequest.PlanItem> planItems = List.of(
@@ -159,8 +150,8 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenGetPredefinedTrainingPlans_whenCalled_thenReturnsPredefinedPlans() {
-        ExerciseEntity exercise1 = ExerciseEntity.builder().name("Predefined Exercise 1").build();
-        ExerciseEntity exercise2 = ExerciseEntity.builder().name("Predefined Exercise 2").build();
+        ExerciseEntity exercise1 = createTestExerciseEntity("Predefined Exercise 1");
+        ExerciseEntity exercise2 = createTestExerciseEntity("Predefined Exercise 2");
 
         exercise1 = exerciseRepository.save(exercise1);
         exercise2 = exerciseRepository.save(exercise2);
@@ -193,17 +184,13 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void givenGetUserTrainingPlans_whenCalled_thenReturnsUserPlans() {
-        ExerciseEntity exercise1 = ExerciseEntity.builder().name("User Exercise 1").build();
-        ExerciseEntity exercise2 = ExerciseEntity.builder().name("User Exercise 2").build();
+        ExerciseEntity exercise1 = createTestExerciseEntity("User Exercise 1");
+        ExerciseEntity exercise2 = createTestExerciseEntity("User Exercise 2");
 
         exercise1 = exerciseRepository.save(exercise1);
         exercise2 = exerciseRepository.save(exercise2);
 
-        UserEntity user = UserEntity.builder()
-                .username("trainer")
-                .passwordHash("securepasswordhash")
-                .build();
-
+        UserEntity user = createTestUserEntity();
         user = userRepository.save(user);
 
         PlanItemEntity planItem1 = PlanItemEntity.builder()
@@ -233,5 +220,20 @@ class TrainingIntegrationTest extends BaseIntegrationTest {
                 .isOk()
                 .expectBodyList(Object.class)
                 .hasSize(1);
+    }
+
+    private ExerciseEntity createTestExerciseEntity(String name) {
+        return ExerciseEntity.builder()
+                .name(name)
+                .category(ExerciseCategory.UNCATEGORIZED)
+                .build();
+    }
+
+    private UserEntity createTestUserEntity() {
+        return UserEntity.builder()
+                .username("testuser")
+                .email("testuser@domain.com")
+                .passwordHash("testpasswordhash")
+                .build();
     }
 }

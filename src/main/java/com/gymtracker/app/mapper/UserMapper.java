@@ -9,6 +9,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, uses = {ExerciseMapper.class, TrainingPlanMapper.class})
 public interface UserMapper {
@@ -20,6 +21,7 @@ public interface UserMapper {
     @Mapping(target = "exercises", ignore = true)
     @Mapping(target = "plans", ignore = true)
     @Mapping(target = "password", ignore = true)
+    @Named("userWithoutCollections")
     User userEntityToUserWithoutCollections(UserEntity userEntity);
 
     @AfterMapping
