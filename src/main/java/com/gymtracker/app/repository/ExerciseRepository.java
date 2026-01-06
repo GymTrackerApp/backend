@@ -13,4 +13,5 @@ public interface ExerciseRepository {
     Exercise save(Exercise exercise);
     Set<Exercise> findAllPredefinedExercises();
     Optional<Exercise> findExerciseAccessibleByUser(Long exerciseId, UUID userId);
+    void deleteById(long exerciseId);
 }

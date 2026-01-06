@@ -95,4 +95,38 @@ class TrainingPlanControllerTest {
         Mockito.verify(trainingPlanService)
                 .getTrainingPlanById(Long.parseLong(trainingPlanId), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
     }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequestToDeleteTrainingPlanById_whenDeleteTrainingPlanByIdCalled_shouldReturnNoContentResponse() throws Exception {
+        String trainingPlanId = "1";
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/plans/" + trainingPlanId))
+                .andExpect(status().isOk());
+
+        Mockito.verify(trainingPlanService)
+                .deleteTrainingPlan(Long.parseLong(trainingPlanId), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenRequestToUpdateTrainingPlanById_whenUpdateTrainingPlanByIdCalled_shouldReturnOkResponse() throws Exception {
+        long trainingPlanId = 1L;
+        TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planName("Updated Plan Name")
+                .planItems(List.of())
+                .build();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/plans/" + trainingPlanId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainingPlanCreationRequest)))
+                .andExpect(status().isOk());
+
+        Mockito.verify(trainingPlanService)
+                .updateCustomTrainingPlan(
+                        trainingPlanCreationRequest,
+                        UUID.fromString("123e4567-e89b-12d3-a456-426614174000"),
+                        trainingPlanId
+                );
+    }
 }

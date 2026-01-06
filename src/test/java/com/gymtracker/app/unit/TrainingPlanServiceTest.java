@@ -5,6 +5,7 @@ import com.gymtracker.app.domain.TrainingPlan;
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.dto.request.TrainingPlanCreationRequest;
 import com.gymtracker.app.exception.ExerciseDoesNotExistException;
+import com.gymtracker.app.exception.TrainingDoesNotExistException;
 import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.repository.ExerciseRepository;
 import com.gymtracker.app.repository.TrainingPlanRepository;
@@ -176,6 +177,101 @@ class TrainingPlanServiceTest {
         Assertions.assertThrows(
                 com.gymtracker.app.exception.TrainingDoesNotExistException.class,
                 () -> trainingPlanService.getTrainingPlanById(trainingPlanId, userId)
+        );
+    }
+
+    @Test
+    void givenNonExistingUserId_whenDeleteTrainingPlanCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(
+                UserDoesNotExistException.class,
+                () -> trainingPlanService.deleteTrainingPlan(trainingPlanId, userId)
+        );
+    }
+
+    @Test
+    void givenTrainingPlanNotOwnedByUser_whenDeleteTrainingPlanCalled_shouldThrowException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        User user = User.builder()
+                .plans(List.of())
+                .build();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(
+                TrainingDoesNotExistException.class,
+                () -> trainingPlanService.deleteTrainingPlan(trainingPlanId, userId)
+        );
+
+        Mockito.verify(trainingPlanRepository, Mockito.never()).deleteById(trainingPlanId);
+    }
+
+    @Test
+    void givenNonExistingUserId_whenUpdateCustomTrainingPlanCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        TrainingPlanCreationRequest trainingPlanCreationRequest = createEmptyTrainingPlanCreationRequest();
+
+        Assertions.assertThrows(
+                UserDoesNotExistException.class,
+                () -> trainingPlanService.updateCustomTrainingPlan(trainingPlanCreationRequest, userId, trainingPlanId)
+        );
+    }
+
+    @Test
+    void givenTrainingPlanNotOwnedByUser_whenUpdateCustomTrainingPlanCalled_shouldThrowException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        User user = User.builder()
+                .plans(List.of())
+                .build();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        TrainingPlanCreationRequest trainingPlanCreationRequest = createEmptyTrainingPlanCreationRequest();
+
+        Assertions.assertThrows(
+                TrainingDoesNotExistException.class,
+                () -> trainingPlanService.updateCustomTrainingPlan(trainingPlanCreationRequest, userId, trainingPlanId)
+        );
+    }
+
+    @Test
+    void givenNonExistingExerciseId_whenUpdateCustomTrainingPlanCalled_shouldThrowExerciseDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long trainingPlanId = 1L;
+
+        User user = User.builder()
+                .plans(List.of(TrainingPlan.builder().id(trainingPlanId).build()))
+                .build();
+
+        Mockito.when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Mockito.when(exerciseRepository.findExerciseAccessibleByUser(any(), any()))
+                .thenReturn(Optional.empty());
+
+        TrainingPlanCreationRequest trainingPlanCreationRequest = TrainingPlanCreationRequest.builder()
+                .planItems(List.of(TrainingPlanCreationRequest.PlanItem.builder().exerciseId(1L).build()))
+                .build();
+
+        Assertions.assertThrows(
+                ExerciseDoesNotExistException.class,
+                () -> trainingPlanService.updateCustomTrainingPlan(trainingPlanCreationRequest, userId, trainingPlanId)
         );
     }
 

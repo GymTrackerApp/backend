@@ -1,7 +1,10 @@
 package com.gymtracker.app.domain;
 
 import com.gymtracker.app.exception.DuplicatedExercisesException;
+import com.gymtracker.app.exception.ExerciseAlreadyExistsException;
+import com.gymtracker.app.exception.ExerciseDoesNotExistException;
 import com.gymtracker.app.exception.PlanWithSameNameAlreadyExistsException;
+import com.gymtracker.app.exception.TrainingDoesNotExistException;
 import com.gymtracker.app.exception.TrainingPlansAmountExceededException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,6 +14,7 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +30,7 @@ public class User implements UserDetails {
     private final UUID userId;
     private String username;
     private String email;
+    private Instant createdAt;
 
     @Setter(AccessLevel.NONE)
     private Password password;
@@ -37,6 +42,12 @@ public class User implements UserDetails {
     }
 
     public Exercise createCustomExercise(String name, ExerciseCategory category) {
+        boolean exerciseWithSameNameExists = exercises.stream()
+                .anyMatch(exercise -> exercise.getName().equals(name));
+        if (exerciseWithSameNameExists) {
+            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
+        }
+
         Exercise newExercise = Exercise.builder()
                 .name(name)
                 .isCustom(true)
@@ -49,26 +60,41 @@ public class User implements UserDetails {
         return newExercise;
     }
 
-    public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.PlanItem> trainingPlanItems) {
-        long distinctExercisesCount = trainingPlanItems.stream()
-                .map(TrainingPlan.PlanItem::getExercise)
-                .distinct()
-                .count();
+    public Exercise updateCustomExercise(long existingExerciseId, String newExerciseName, ExerciseCategory exerciseCategory) {
+        Exercise exercise = exercises.stream()
+                .filter(ex -> ex.getExerciseId().equals(existingExerciseId))
+                .findFirst()
+                .orElseThrow(() -> new ExerciseDoesNotExistException("Cannot update non-existing exercise"));
 
-        if (distinctExercisesCount != trainingPlanItems.size()) {
-            throw new DuplicatedExercisesException("Training plan items contain duplicated exercises");
+        boolean exerciseWithSameNameExists = exercises.stream()
+                .filter(ex -> !ex.getExerciseId().equals(existingExerciseId))
+                .anyMatch(ex -> ex.getName().equals(newExerciseName));
+
+        if (exerciseWithSameNameExists) {
+            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
         }
+
+        exercise.setName(newExerciseName);
+        exercise.setCategory(exerciseCategory);
+        return exercise;
+    }
+
+    public void removeCustomExercise(long exerciseId) {
+        if (exercises.stream().noneMatch(exercise -> exercise.getExerciseId().equals(exerciseId))) {
+            throw new ExerciseDoesNotExistException("Cannot delete non-existing exercise");
+        }
+
+        exercises.removeIf(exercise -> exercise.getExerciseId().equals(exerciseId));
+    }
+
+    public TrainingPlan createCustomTrainingPlan(String planName, List<TrainingPlan.PlanItem> trainingPlanItems) {
+        validateDuplicatedExercises(trainingPlanItems);
 
         if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
             throw new TrainingPlansAmountExceededException("User cannot have more than " + MAX_TRAINING_PLANS_PER_USER + " training plans");
         }
 
-        boolean planWithSameNameExists = plans.stream()
-                .anyMatch(trainingPlan -> trainingPlan.getName().equals(planName));
-
-        if (planWithSameNameExists) {
-            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
-        }
+        validateDuplicatedPlanName(planName);
 
         TrainingPlan newPlan = TrainingPlan.builder()
                 .name(planName)
@@ -80,6 +106,55 @@ public class User implements UserDetails {
         plans.add(newPlan);
 
         return newPlan;
+    }
+
+    public TrainingPlan updateCustomTrainingPlan(long existingPlanId, String newName, List<TrainingPlan.PlanItem> newPlanItems) {
+        TrainingPlan trainingPlan = plans.stream()
+                .filter(plan -> plan.getId().equals(existingPlanId))
+                .findFirst()
+                .orElseThrow(() -> new TrainingDoesNotExistException("Cannot update non-existing training plan"));
+
+        boolean planWithSameNameExists = plans.stream()
+                .filter(plan -> !plan.getId().equals(existingPlanId))
+                .anyMatch(plan -> plan.getName().equals(newName));
+
+        if (planWithSameNameExists) {
+            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+        }
+
+        validateDuplicatedExercises(newPlanItems);
+
+        trainingPlan.setName(newName);
+        trainingPlan.setPlanItems(newPlanItems);
+        return trainingPlan;
+    }
+
+    public void removeCustomTrainingPlan(long planId) {
+        if (plans.stream().noneMatch(plan -> plan.getId().equals(planId))) {
+            throw new TrainingDoesNotExistException("Cannot delete non-existing training plan");
+        }
+
+        plans.removeIf(plan -> plan.getId().equals(planId));
+    }
+
+    private void validateDuplicatedPlanName(String planName) {
+        boolean planWithSameNameExists = plans.stream()
+                .anyMatch(trainingPlan -> trainingPlan.getName().equals(planName));
+
+        if (planWithSameNameExists) {
+            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+        }
+    }
+
+    private void validateDuplicatedExercises(List<TrainingPlan.PlanItem> trainingPlanItems) {
+        long distinctExercisesCount = trainingPlanItems.stream()
+                .map(TrainingPlan.PlanItem::getExercise)
+                .distinct()
+                .count();
+
+        if (distinctExercisesCount != trainingPlanItems.size()) {
+            throw new DuplicatedExercisesException("Training plan items contain duplicated exercises");
+        }
     }
 
     @Override

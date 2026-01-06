@@ -34,4 +34,9 @@ public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
     public boolean existsInUserAccessiblePlans(Long trainingId, UUID userId) {
         return repository.existsByIdAndOwnerUserId(trainingId, userId) || repository.existsByIdAndIsCustomIsFalse(trainingId);
     }
+
+    @Override
+    public void deleteById(long trainingPlanId) {
+        repository.deleteById(trainingPlanId);
+    }
 }

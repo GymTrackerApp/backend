@@ -28,7 +28,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
 
     @Override
     @Transactional
-    public TrainingPlan generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId) {
+    public void generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot create training plan for non-existing user"));
 
@@ -43,7 +43,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
                 .toList();
 
         TrainingPlan trainingPlan = user.createCustomTrainingPlan(request.planName(), trainingPlanItems);
-        return trainingPlanRepository.save(trainingPlan);
+        trainingPlanRepository.save(trainingPlan);
     }
 
     @Override
@@ -74,5 +74,36 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
                 .filter(plan -> plan.getId().equals(trainingPlanId))
                 .findFirst()
                 .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist")));
+    }
+
+    @Override
+    @Transactional
+    public void deleteTrainingPlan(long planId, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("Cannot delete training plan for non-existing user"));
+
+        user.removeCustomTrainingPlan(planId);
+
+        trainingPlanRepository.deleteById(planId);
+    }
+
+    @Override
+    @Transactional
+    public void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserDoesNotExistException("Cannot update training plan for non-existing user"));
+
+        List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
+                .stream()
+                .map(planItem -> {
+                    Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
+                            .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
+
+                    return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
+                })
+                .toList();
+
+        TrainingPlan trainingPlan = user.updateCustomTrainingPlan(planId, request.planName(), trainingPlanItems);
+        trainingPlanRepository.save(trainingPlan);
     }
 }

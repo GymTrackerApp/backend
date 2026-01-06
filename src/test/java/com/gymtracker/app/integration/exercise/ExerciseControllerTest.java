@@ -82,4 +82,26 @@ class ExerciseControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$").exists());
     }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidRequest_whenDeleteExerciseCalled_shouldReturnNoContentResponse() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete("/exercises/1"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
+    void givenValidRequest_whenUpdateExerciseCalled_shouldReturnOkResponse() throws Exception {
+        long exerciseId = 1L;
+        ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
+                .name("Updated exercise name")
+                .category(ExerciseCategory.UNCATEGORIZED)
+                .build();
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/exercises/" + exerciseId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseCreationRequest)))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
 }

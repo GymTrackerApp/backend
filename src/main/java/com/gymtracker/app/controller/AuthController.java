@@ -46,4 +46,10 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(refreshTokenResponse);
     }
+
+    @PostMapping("/sign-out")
+    public ResponseEntity<MessageResponse> signOut(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        authService.signOut(refreshTokenRequest.refreshToken());
+        return ResponseEntity.ok(new MessageResponse("User signed out successfully"));
+    }
 }

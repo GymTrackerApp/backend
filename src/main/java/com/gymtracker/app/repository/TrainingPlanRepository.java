@@ -9,4 +9,5 @@ public interface TrainingPlanRepository {
     TrainingPlan save(TrainingPlan trainingPlan);
     List<TrainingPlan> findAllPredefinedPlans();
     boolean existsInUserAccessiblePlans(Long trainingId, UUID userId);
+    void deleteById(long trainingPlanId);
 }

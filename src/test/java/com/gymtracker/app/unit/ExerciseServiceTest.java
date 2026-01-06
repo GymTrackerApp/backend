@@ -1,9 +1,12 @@
 package com.gymtracker.app.unit;
 
 import com.gymtracker.app.domain.Exercise;
+import com.gymtracker.app.domain.ExerciseCategory;
 import com.gymtracker.app.domain.User;
+import com.gymtracker.app.dto.request.ExerciseCreationRequest;
 import com.gymtracker.app.entity.UserEntity;
 import com.gymtracker.app.exception.ExerciseAlreadyExistsException;
+import com.gymtracker.app.exception.ExerciseDoesNotExistException;
 import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.repository.ExerciseRepository;
 import com.gymtracker.app.repository.UserRepository;
@@ -138,5 +141,66 @@ class ExerciseServiceTest {
         Set<Exercise> result = exerciseService.getPredefinedExercises();
 
         Assertions.assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void givenNonExistingUserId_whenDeleteCustomExerciseCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> exerciseService.deleteCustomExercise(exerciseId, userId));
+    }
+
+    @Test
+    void givenExerciseNotOwnedByUser_whenDeleteCustomExerciseCalled_shouldThrowException() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+
+        User user = User.builder()
+                .userId(userId)
+                .exercises(Set.of(Exercise.builder().exerciseId(2L).build()))
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(ExerciseDoesNotExistException.class, () -> exerciseService.deleteCustomExercise(exerciseId, userId));
+    }
+
+    @Test
+    void givenNonExistingUserId_whenUpdateCustomExerciseCalled_shouldThrowUserDoesNotExistException() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+        ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
+                .name("Updated Exercise")
+                .category(ExerciseCategory.UNCATEGORIZED)
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThrows(UserDoesNotExistException.class, () -> exerciseService.updateCustomExercise(exerciseId, exerciseCreationRequest, userId));
+    }
+
+    @Test
+    void givenExerciseNotOwnedByUser_whenUpdateCustomExerciseCalled_shouldThrowException() {
+        UUID userId = UUID.randomUUID();
+        long exerciseId = 1L;
+        ExerciseCreationRequest exerciseCreationRequest = ExerciseCreationRequest.builder()
+                .name("Updated Exercise")
+                .category(ExerciseCategory.UNCATEGORIZED)
+                .build();
+
+        User owner = User.builder()
+                .exercises(Set.of(Exercise.builder().exerciseId(2L).name("Exercise 2").build()))
+                .build();
+
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(owner));
+
+        Assertions.assertThrows(ExerciseDoesNotExistException.class, () -> exerciseService.updateCustomExercise(exerciseId, exerciseCreationRequest, userId));
     }
 }

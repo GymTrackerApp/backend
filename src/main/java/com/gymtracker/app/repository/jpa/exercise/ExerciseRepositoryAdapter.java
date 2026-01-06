@@ -55,4 +55,9 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
         Optional<ExerciseEntity> exerciseEntity = repository.findExerciseAccessibleByUser(exerciseId, userId);
         return exerciseEntity.map(mapper::exerciseEntityToExercise);
     }
+
+    @Override
+    public void deleteById(long exerciseId) {
+        repository.deleteById(exerciseId);
+    }
 }

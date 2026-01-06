@@ -49,4 +49,9 @@ public class RefreshTokenRepositoryAdapter implements RefreshTokenRepository {
     public void deleteById(UUID tokenId) {
         refreshTokenRepository.deleteById(tokenId);
     }
+
+    @Override
+    public void deleteByTokenHash(String tokenHash) {
+        refreshTokenRepository.deleteByTokenHash(tokenHash);
+    }
 }

@@ -3,6 +3,7 @@ package com.gymtracker.app.mapper;
 import com.gymtracker.app.domain.Password;
 import com.gymtracker.app.domain.User;
 import com.gymtracker.app.dto.request.SignUp;
+import com.gymtracker.app.dto.response.UserProfileResponse;
 import com.gymtracker.app.entity.UserEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -37,4 +38,7 @@ public interface UserMapper {
     default Password map(String value) {
         return new Password(value);
     }
+
+    @Mapping(target = "username", source = "displayUsername")
+    UserProfileResponse userToUserProfileResponse(User user);
 }

@@ -9,7 +9,6 @@ import com.gymtracker.app.dto.response.SignInResponse;
 import com.gymtracker.app.exception.SessionExpiredException;
 import com.gymtracker.app.exception.SignInException;
 import com.gymtracker.app.exception.UserAlreadyExistsException;
-import com.gymtracker.app.exception.UserDoesNotExistException;
 import com.gymtracker.app.mapper.UserMapper;
 import com.gymtracker.app.repository.RefreshTokenRepository;
 import com.gymtracker.app.repository.UserRepository;
@@ -24,8 +23,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.HexFormat;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -84,6 +83,13 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken = jwtService.generateToken(user.getDisplayUsername(), user.getUsername());
 
         return new RefreshTokenResponse(newAccessToken, newRefreshToken);
+    }
+
+    @Override
+    @Transactional
+    public void signOut(String refreshToken) {
+        String tokenHash = hashToken(refreshToken);
+        refreshTokenRepository.deleteByTokenHash(tokenHash);
     }
 
     private String hashToken(String rawToken) {
