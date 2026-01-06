@@ -87,7 +87,7 @@ class ExerciseControllerTest {
     @WithMockUser(username = "123e4567-e89b-12d3-a456-426614174000")
     void givenValidRequest_whenDeleteExerciseCalled_shouldReturnNoContentResponse() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete("/exercises/1"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent());
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test

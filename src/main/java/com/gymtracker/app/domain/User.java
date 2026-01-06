@@ -42,7 +42,11 @@ public class User implements UserDetails {
     }
 
     public Exercise createCustomExercise(String name, ExerciseCategory category) {
-        validateDuplicatedExerciseName(name);
+        boolean exerciseWithSameNameExists = exercises.stream()
+                .anyMatch(exercise -> exercise.getName().equals(name));
+        if (exerciseWithSameNameExists) {
+            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
+        }
 
         Exercise newExercise = Exercise.builder()
                 .name(name)
@@ -62,21 +66,17 @@ public class User implements UserDetails {
                 .findFirst()
                 .orElseThrow(() -> new ExerciseDoesNotExistException("Cannot update non-existing exercise"));
 
-        exercises.remove(exercise);
+        boolean exerciseWithSameNameExists = exercises.stream()
+                .filter(ex -> !ex.getExerciseId().equals(existingExerciseId))
+                .anyMatch(ex -> ex.getName().equals(newExerciseName));
 
-        validateDuplicatedExerciseName(newExerciseName);
+        if (exerciseWithSameNameExists) {
+            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
+        }
 
         exercise.setName(newExerciseName);
         exercise.setCategory(exerciseCategory);
-        exercises.add(exercise);
-
         return exercise;
-    }
-
-    private void validateDuplicatedExerciseName(String name) {
-        if (exercises.stream().anyMatch(exercise -> exercise.getName().equals(name))) {
-            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
-        }
     }
 
     public void removeCustomExercise(long exerciseId) {
@@ -114,16 +114,27 @@ public class User implements UserDetails {
                 .findFirst()
                 .orElseThrow(() -> new TrainingDoesNotExistException("Cannot update non-existing training plan"));
 
-        plans.remove(trainingPlan);
+        boolean planWithSameNameExists = plans.stream()
+                .filter(plan -> !plan.getId().equals(existingPlanId))
+                .anyMatch(plan -> plan.getName().equals(newName));
 
-        validateDuplicatedPlanName(newName);
+        if (planWithSameNameExists) {
+            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+        }
+
         validateDuplicatedExercises(newPlanItems);
 
         trainingPlan.setName(newName);
         trainingPlan.setPlanItems(newPlanItems);
-        plans.add(trainingPlan);
-
         return trainingPlan;
+    }
+
+    public void removeCustomTrainingPlan(long planId) {
+        if (plans.stream().noneMatch(plan -> plan.getId().equals(planId))) {
+            throw new TrainingDoesNotExistException("Cannot delete non-existing training plan");
+        }
+
+        plans.removeIf(plan -> plan.getId().equals(planId));
     }
 
     private void validateDuplicatedPlanName(String planName) {

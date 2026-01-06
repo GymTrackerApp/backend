@@ -77,18 +77,18 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     }
 
     @Override
+    @Transactional
     public void deleteTrainingPlan(long planId, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot delete training plan for non-existing user"));
 
-        if (user.getPlans().stream().noneMatch(plan -> plan.getId().equals(planId))) {
-            throw new TrainingDoesNotExistException("Cannot delete non-existing training plan");
-        }
+        user.removeCustomTrainingPlan(planId);
 
         trainingPlanRepository.deleteById(planId);
     }
 
     @Override
+    @Transactional
     public void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot update training plan for non-existing user"));

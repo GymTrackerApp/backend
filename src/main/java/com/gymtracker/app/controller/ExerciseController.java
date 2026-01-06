@@ -72,7 +72,7 @@ public class ExerciseController {
         exerciseService.deleteCustomExercise(exerciseId, UUID.fromString(userDetails.getUsername()));
 
         MessageResponse messageResponse = new MessageResponse("Exercise deleted successfully");
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(messageResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 
     @PutMapping("/{exerciseId}")

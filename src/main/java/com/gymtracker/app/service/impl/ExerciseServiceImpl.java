@@ -10,6 +10,7 @@ import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.service.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
@@ -49,6 +50,7 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
+    @Transactional
     public void deleteCustomExercise(long exerciseId, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot delete exercise for non-existing user"));
@@ -59,6 +61,7 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
+    @Transactional
     public Exercise updateCustomExercise(long exerciseId, ExerciseCreationRequest exerciseCreationRequest, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot update exercise for non-existing user"));

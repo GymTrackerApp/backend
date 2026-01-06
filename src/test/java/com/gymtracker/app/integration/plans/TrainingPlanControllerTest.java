@@ -102,7 +102,7 @@ class TrainingPlanControllerTest {
         String trainingPlanId = "1";
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/plans/" + trainingPlanId))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         Mockito.verify(trainingPlanService)
                 .deleteTrainingPlan(Long.parseLong(trainingPlanId), UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));

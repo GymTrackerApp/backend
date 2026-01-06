@@ -88,12 +88,12 @@ public class TrainingPlanController {
         trainingPlanService.deleteTrainingPlan(planId, UUID.fromString(userDetails.getUsername()));
 
         MessageResponse response = new MessageResponse("Training plan deleted successfully");
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/{planId}")
     public ResponseEntity<MessageResponse> updateCustomTrainingPlanById(
-            @RequestBody TrainingPlanCreationRequest trainingPlanCreationRequest,
+            @Valid @RequestBody TrainingPlanCreationRequest trainingPlanCreationRequest,
             @PathVariable("planId") long planId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
