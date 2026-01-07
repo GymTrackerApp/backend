@@ -63,13 +63,15 @@ class ExerciseServiceTest {
         Exercise exercise = Exercise.builder()
                 .name("My new exercise")
                 .build();
-        UserEntity owner = new UserEntity();
-        owner.setUserId(UUID.randomUUID());
 
-        when(exerciseRepository.existsByNameAndOwnerUserId(exercise.getName(), owner.getUserId()))
-                .thenReturn(true);
+        User user = User.builder()
+                .exercises(Set.of(exercise))
+                .build();
 
-        Assertions.assertThrows(ExerciseAlreadyExistsException.class, () -> exerciseService.createCustomExercise(exercise, owner.getUserId()));
+        Mockito.when(userRepository.findById(any()))
+                .thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(ExerciseAlreadyExistsException.class, () -> exerciseService.createCustomExercise(exercise, user.getUserId()));
     }
 
     @Test

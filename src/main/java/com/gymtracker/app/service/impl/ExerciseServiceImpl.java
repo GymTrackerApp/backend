@@ -23,9 +23,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     public Exercise createCustomExercise(Exercise exercise, UUID ownerId) {
-        if (exerciseRepository.existsByNameAndOwnerUserId(exercise.getName(), ownerId))
-            throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in your exercises",  exercise.getName()));
-        else if (exerciseRepository.existsByNameAndOwnerIsNull(exercise.getName()))
+        if (exerciseRepository.existsByNameAndOwnerIsNull(exercise.getName()))
             throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in predefined exercises",  exercise.getName()));
 
         User owner = userRepository.findById(ownerId)
@@ -63,6 +61,9 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Override
     @Transactional
     public Exercise updateCustomExercise(long exerciseId, ExerciseCreationRequest exerciseCreationRequest, UUID userId) {
+        if (exerciseRepository.existsByNameAndOwnerIsNull(exerciseCreationRequest.name()))
+            throw new ExerciseAlreadyExistsException("Exercise already exists in predefined exercises");
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserDoesNotExistException("Cannot update exercise for non-existing user"));
 
