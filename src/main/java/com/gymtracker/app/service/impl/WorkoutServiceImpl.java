@@ -42,7 +42,12 @@ public class WorkoutServiceImpl implements WorkoutService {
             throw new UserDoesNotExistException("Cannot create workout for non-existing user");
         }
 
-        if (request.trainingId() != null && !trainingPlanRepository.existsInUserAccessiblePlans(request.trainingId(), userId)) {
+        if (request.trainingId() != null
+                &&
+            (!trainingPlanRepository.existsInUserAccessiblePlans(request.trainingId(), userId)
+                    ||
+            trainingPlanRepository.isDeleted(request.trainingId()))
+        ) {
             throw new TrainingDoesNotExistException("Cannot create workout for non-accessible training plan");
         }
 
@@ -105,7 +110,10 @@ public class WorkoutServiceImpl implements WorkoutService {
             throw new UserDoesNotExistException("Cannot get workout history for non-existing user");
         }
 
-        if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingId, userId)) {
+        if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingId, userId)
+                ||
+            trainingPlanRepository.isDeleted(trainingId)
+        ) {
             throw new TrainingDoesNotExistException("Cannot get workout history for non-existing training plan");
         }
 

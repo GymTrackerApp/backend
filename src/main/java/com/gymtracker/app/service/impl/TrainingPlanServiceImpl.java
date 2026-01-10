@@ -77,6 +77,20 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     }
 
     @Override
+    public TrainingPlan getTrainingPlanByIdForWorkoutHistory(long trainingPlanId, UUID userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserDoesNotExistException("Cannot retrieve training plan for non-existing user");
+        }
+
+        if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId)) {
+            throw new TrainingDoesNotExistException("Cannot retrieve non-accessible training plan");
+        }
+
+        return trainingPlanRepository.findById(trainingPlanId)
+                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist"));
+    }
+
+    @Override
     @Transactional
     public void deleteTrainingPlan(long planId, UUID userId) {
         User user = userRepository.findById(userId)

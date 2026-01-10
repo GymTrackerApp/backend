@@ -39,4 +39,6 @@ public class TrainingPlanEntity {
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")
     private UserEntity owner;
+
+    private boolean isDeleted;
 }

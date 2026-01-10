@@ -50,7 +50,7 @@ public class WorkoutController {
         List<Workout> workouts = workoutService.getWorkouts(pageable, startDate, endDate, trainingPlanId, UUID.fromString(userDetails.getUsername()));
         List<WorkoutDTO> workoutDTOS = workouts.stream()
                 .map(workout -> {
-                    TrainingPlan trainingPlan = trainingPlanService.getTrainingPlanById(workout.getTrainingId(), UUID.fromString(userDetails.getUsername()));
+                    TrainingPlan trainingPlan = trainingPlanService.getTrainingPlanByIdForWorkoutHistory(workout.getTrainingId(), UUID.fromString(userDetails.getUsername()));
                     return workoutMapper.workoutToWorkoutDTO(workout, trainingPlan);
                 })
                 .toList();

@@ -1,6 +1,7 @@
 package com.gymtracker.app.unit;
 
 import com.gymtracker.app.domain.Exercise;
+import com.gymtracker.app.domain.User;
 import com.gymtracker.app.domain.workout.Workout;
 import com.gymtracker.app.dto.request.WorkoutCreationRequest;
 import com.gymtracker.app.dto.request.WorkoutItemDTO;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+
 @ExtendWith(MockitoExtension.class)
 class WorkoutServiceTest {
     @InjectMocks
@@ -72,6 +75,29 @@ class WorkoutServiceTest {
     @Test
     void contextLoads() {
         Assertions.assertNotNull(workoutService);
+    }
+
+    @Test
+    void givenNonExistingTrainingId_whenCreateWorkout_thenTrainingDoesNotExistExceptionIsThrown() {
+        WorkoutCreationRequest workoutCreationRequest = generateSampleWorkoutCreationRequest();
+
+        User user = User.builder()
+                .userId(UUID.randomUUID())
+                .build();
+
+        Mockito.when(userRepository.existsById(user.getUserId()))
+                .thenReturn(true);
+
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(any(), any()))
+                    .thenReturn(true);
+
+        Mockito.when(trainingPlanRepository.isDeleted(workoutCreationRequest.trainingId()))
+                .thenReturn(true);
+
+        Assertions.assertThrows(
+                TrainingDoesNotExistException.class,
+                () -> workoutService.createWorkout(workoutCreationRequest, user.getUserId())
+        );
     }
 
     @Test
@@ -316,6 +342,33 @@ class WorkoutServiceTest {
         Assertions.assertThrows(InvalidPeriodException.class, () -> {
             workoutService.getWorkoutExerciseHistoryByWorkoutInPeriod(
                     exerciseId,
+                    startDate,
+                    endDate,
+                    userId
+            );
+        });
+    }
+
+    @Test
+    void givenDeletedTrainingId_whenGetWorkoutTrainingHistory_thenTrainingDoesNotExistExceptionIsThrown() {
+        UUID userId = UUID.randomUUID();
+        long trainingId = 1L;
+
+        LocalDate startDate = LocalDate.of(2000, 1, 1);
+        LocalDate endDate = LocalDate.of(2020, 2, 1);
+
+        Mockito.when(userRepository.existsById(userId))
+                .thenReturn(true);
+
+        Mockito.when(trainingPlanRepository.existsInUserAccessiblePlans(trainingId, userId))
+                .thenReturn(true);
+
+        Mockito.when(trainingPlanRepository.isDeleted(trainingId))
+                .thenReturn(true);
+
+        Assertions.assertThrows(TrainingDoesNotExistException.class, () -> {
+            workoutService.getWorkoutTrainingHistory(
+                    trainingId,
                     startDate,
                     endDate,
                     userId

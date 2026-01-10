@@ -11,6 +11,7 @@ public interface TrainingPlanService {
     List<TrainingPlan> getAllPredefinedTrainingPlans();
     List<TrainingPlan> getUserTrainingPlans(UUID ownerId);
     TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId);
+    TrainingPlan getTrainingPlanByIdForWorkoutHistory(long trainingPlanId, UUID userId);
     void deleteTrainingPlan(long planId, UUID userId);
     void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId);
 }
