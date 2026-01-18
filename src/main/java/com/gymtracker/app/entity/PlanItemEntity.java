@@ -1,5 +1,6 @@
 package com.gymtracker.app.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,7 +19,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PlanItemEntity {
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "exercise_id", referencedColumnName = "exerciseId")
     private ExerciseEntity exercise;
     private int defaultSets;
