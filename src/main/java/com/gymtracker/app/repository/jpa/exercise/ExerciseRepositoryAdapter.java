@@ -19,11 +19,6 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
     private final ExerciseMapper mapper;
 
     @Override
-    public boolean existsByNameAndOwnerUserId(String name, UUID ownerId) {
-        return repository.existsByNameAndOwnerUserId(name, ownerId);
-    }
-
-    @Override
     public boolean existsByNameAndOwnerIsNull(String name) {
         return repository.existsByNameAndOwnerIsNull(name);
     }
