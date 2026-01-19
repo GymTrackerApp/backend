@@ -11,6 +11,7 @@ import org.mapstruct.MappingConstants;
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ExerciseMapper {
     Exercise exerciseCreationRequestToExercise(ExerciseCreationRequest exerciseCreationRequest);
+    @Mapping(source = "custom", target = "isCustom")
     ExerciseDTO exerciseToExerciseDTO(Exercise exercise);
 
     @Mapping(source = "ownerId", target = "owner.userId")

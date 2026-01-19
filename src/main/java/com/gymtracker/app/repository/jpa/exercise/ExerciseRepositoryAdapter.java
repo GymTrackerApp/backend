@@ -19,11 +19,6 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
     private final ExerciseMapper mapper;
 
     @Override
-    public boolean existsByNameAndOwnerUserId(String name, UUID ownerId) {
-        return repository.existsByNameAndOwnerUserId(name, ownerId);
-    }
-
-    @Override
     public boolean existsByNameAndOwnerIsNull(String name) {
         return repository.existsByNameAndOwnerIsNull(name);
     }
@@ -58,6 +53,7 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
 
     @Override
     public void deleteById(long exerciseId) {
-        repository.deleteById(exerciseId);
+        repository.findById(exerciseId)
+                .ifPresent(exercise -> exercise.setDeleted(true));
     }
 }

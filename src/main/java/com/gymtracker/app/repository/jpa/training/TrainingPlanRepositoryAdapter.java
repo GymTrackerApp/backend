@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -25,18 +26,43 @@ public class TrainingPlanRepositoryAdapter implements TrainingPlanRepository {
 
     @Override
     public List<TrainingPlan> findAllPredefinedPlans() {
-        return repository.findAllByIsCustomFalse().stream()
+        return repository.findAllByIsCustomFalseAndIsDeletedFalse().stream()
                 .map(trainingPlanMapper::trainingPlanEntityToTrainingPlan)
                 .toList();
     }
 
     @Override
     public boolean existsInUserAccessiblePlans(Long trainingId, UUID userId) {
-        return repository.existsByIdAndOwnerUserId(trainingId, userId) || repository.existsByIdAndIsCustomIsFalse(trainingId);
+        TrainingPlanEntity trainingPlanEntity = repository.findById(trainingId)
+                .orElse(null);
+
+        return trainingPlanEntity != null
+                &&
+                (!trainingPlanEntity.isCustom()
+                        ||
+                 trainingPlanEntity.getOwner().getUserId().equals(userId));
+    }
+
+    @Override
+    public boolean isDeleted(long trainingPlanId) {
+        TrainingPlanEntity trainingPlanEntity = repository.findById(trainingPlanId)
+                .orElse(null);
+        return trainingPlanEntity == null || trainingPlanEntity.isDeleted();
     }
 
     @Override
     public void deleteById(long trainingPlanId) {
-        repository.deleteById(trainingPlanId);
+        TrainingPlanEntity trainingPlanEntity = repository.findById(trainingPlanId).orElse(null);
+        if (trainingPlanEntity == null)
+            return;
+
+        trainingPlanEntity.setDeleted(true);
+        repository.save(trainingPlanEntity);
+    }
+
+    @Override
+    public Optional<TrainingPlan> findById(long trainingPlanId) {
+        return repository.findById(trainingPlanId)
+                .map(trainingPlanMapper::trainingPlanEntityToTrainingPlan);
     }
 }

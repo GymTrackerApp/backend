@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -42,8 +43,10 @@ public class UserEntity {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "owner")
+    @SQLRestriction("is_deleted = false")
     private Set<ExerciseEntity> exercises;
 
     @OneToMany(mappedBy = "owner")
+    @SQLRestriction("is_deleted = false")
     private List<TrainingPlanEntity> plans;
 }

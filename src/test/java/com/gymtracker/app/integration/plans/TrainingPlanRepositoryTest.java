@@ -77,7 +77,7 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
                 .build();
         trainingPlanRepository.save(trainingPlanEntity);
 
-        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
+        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalseAndIsDeletedFalse();
 
         Assertions.assertFalse(predefinedPlans.isEmpty());
         Assertions.assertTrue(predefinedPlans.stream()
@@ -99,7 +99,7 @@ class TrainingPlanRepositoryTest extends BaseIntegrationTest {
                 .build();
         trainingPlanRepository.save(trainingPlanEntity);
 
-        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalse();
+        List<TrainingPlanEntity> predefinedPlans = trainingPlanRepository.findAllByIsCustomFalseAndIsDeletedFalse();
         Assertions.assertTrue(predefinedPlans.isEmpty());
     }
 
