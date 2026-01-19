@@ -37,4 +37,6 @@ public class ExerciseEntity {
     @ManyToOne(targetEntity = UserEntity.class)
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")
     private UserEntity owner;
+
+    private boolean isDeleted;
 }

@@ -43,6 +43,7 @@ public class UserEntity {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "owner")
+    @SQLRestriction("is_deleted = false")
     private Set<ExerciseEntity> exercises;
 
     @OneToMany(mappedBy = "owner")

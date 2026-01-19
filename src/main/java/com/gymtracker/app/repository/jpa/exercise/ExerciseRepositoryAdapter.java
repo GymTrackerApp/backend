@@ -53,6 +53,7 @@ public class ExerciseRepositoryAdapter implements ExerciseRepository {
 
     @Override
     public void deleteById(long exerciseId) {
-        repository.deleteById(exerciseId);
+        repository.findById(exerciseId)
+                .ifPresent(exercise -> exercise.setDeleted(true));
     }
 }
