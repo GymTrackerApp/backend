@@ -78,7 +78,7 @@ class WorkoutServiceTest {
     }
 
     @Test
-    void givenNonExistingTrainingId_whenCreateWorkout_thenTrainingDoesNotExistExceptionIsThrown() {
+    void givenDeletedTrainingId_whenCreateWorkout_thenTrainingDoesNotExistExceptionIsThrown() {
         WorkoutCreationRequest workoutCreationRequest = generateSampleWorkoutCreationRequest();
 
         User user = User.builder()
