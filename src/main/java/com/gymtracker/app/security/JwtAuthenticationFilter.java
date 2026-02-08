@@ -32,7 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
         this.publicEndpoints = new OrRequestMatcher(
-                PathPatternRequestMatcher.withDefaults().matcher("/"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/index.html"),
+                PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/static/**"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-up"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/sign-in"),
                 PathPatternRequestMatcher.withDefaults().matcher("/auth/refresh"),
