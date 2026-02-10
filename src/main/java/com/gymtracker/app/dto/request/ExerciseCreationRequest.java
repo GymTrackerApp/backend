@@ -11,7 +11,7 @@ import lombok.Builder;
 public record ExerciseCreationRequest(
         @NotBlank(message = "Exercise name should be provided")
         @Size(min = 2, max = 100, message = "Exercise name must be between 2 and 100 characters long")
-        @Pattern(regexp = "[\\p{L}0-9-' ]+", message = "Exercise name can only contain letters, numbers and spaces")
+        @Pattern(regexp = "[\\p{L}0-9\\-' ]+", message = "Exercise name can only contain letters, numbers, hyphens, apostrophes and spaces")
         String name,
 
         @NotNull(message = "Exercise category should be provided")
