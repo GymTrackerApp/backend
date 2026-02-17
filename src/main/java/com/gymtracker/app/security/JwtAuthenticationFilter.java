@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,7 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             ErrorResponse errorResponse = new ErrorResponse(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    messageSource.getMessage("no-authorization-header-exception", null, LocaleContextHolder.getLocale())
+                    messageSource.getMessage("no-authorization-header-exception", null, request.getLocale())
             );
             writeJsonErrorResponse(response, errorResponse);
             return;
@@ -75,7 +74,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (JwtException e) {
             writeJsonErrorResponse(response, new ErrorResponse(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    messageSource.getMessage("invalid-or-expired-token-exception", null, LocaleContextHolder.getLocale()))
+                    messageSource.getMessage("invalid-or-expired-token-exception", null, request.getLocale()))
             );
             return;
         }
@@ -89,7 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } catch (UsernameNotFoundException e) {
                 writeJsonErrorResponse(response, new ErrorResponse(
                         HttpServletResponse.SC_UNAUTHORIZED,
-                        messageSource.getMessage("authentication-failed", null, LocaleContextHolder.getLocale()))
+                        messageSource.getMessage("authentication-failed", null, request.getLocale()))
                 );
                 return;
             }

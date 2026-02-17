@@ -69,28 +69,12 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST, errorMessage));
     }
 
-    @ExceptionHandler(value = ExerciseAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleExerciseAlreadyExistsException(ExerciseAlreadyExistsException e) {
-        log.error("Exercise already exists exception occurred", e);
-
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
     @ExceptionHandler(value = ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
         log.error("Constraint violation exception occurred", e);
 
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class, TrainingDoesNotExistException.class})
-    public ResponseEntity<ErrorResponse> handleNotFoundException(DomainException e) {
-        log.error("Not found exception occurred", e);
-
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
@@ -125,10 +109,20 @@ public class GlobalExceptionHandler {
         log.error("Domain exception occurred", e);
         String messageKey = e.getKey();
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST,
+                e.getStatus(),
                 messageSource.getMessage(messageKey, e.getArgs(), LocaleContextHolder.getLocale())
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(e.getStatus()).body(errorResponse);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleBaseKeyException(BaseKeyException e) {
+        log.error("Exception occurred", e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getStatus(),
+                messageSource.getMessage(e.getKey(), e.getArgs(), LocaleContextHolder.getLocale())
+        );
+        return ResponseEntity.status(e.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(value = Exception.class)

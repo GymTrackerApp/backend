@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -46,9 +45,6 @@ class AuthServiceTest {
 
     @Mock
     private JwtService jwtService;
-
-    @Spy
-    private MessageSource messageSource;
 
     @Test
     void contextLoads() {

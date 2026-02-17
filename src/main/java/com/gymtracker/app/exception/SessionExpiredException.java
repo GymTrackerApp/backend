@@ -1,7 +1,9 @@
 package com.gymtracker.app.exception;
 
-public class SessionExpiredException extends RuntimeException {
-    public SessionExpiredException(String message) {
-        super(message);
+import org.springframework.http.HttpStatus;
+
+public class SessionExpiredException extends BaseKeyException {
+    public SessionExpiredException(String subkey) {
+        super("session-expired-exception." + subkey, HttpStatus.UNAUTHORIZED);
     }
 }

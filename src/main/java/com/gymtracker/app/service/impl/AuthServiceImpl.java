@@ -15,8 +15,6 @@ import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.security.JwtService;
 import com.gymtracker.app.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,14 +36,10 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    private final MessageSource messageSource;
-
     @Override
     public void signUp(SignUp signUp) {
         if (userRepository.existsByEmail(signUp.email()) || userRepository.existsByUsername(signUp.username()))
-            throw new UserAlreadyExistsException(
-                    messageSource.getMessage("user-already-exists-exception", null, LocaleContextHolder.getLocale())
-            );
+            throw new UserAlreadyExistsException("user-already-exists-exception");
 
         User user = userMapper.signUpToUser(signUp);
         user.updatePassword(passwordEncoder.encode(signUp.password()));
@@ -56,16 +50,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignInResponse signIn(SignIn signIn) {
         User user = userRepository.findByEmail(signIn.email())
-                .orElseThrow(
-                        () -> new SignInException(
-                                messageSource.getMessage("sign-in-exception", null, LocaleContextHolder.getLocale())
-                        )
-                );
+                .orElseThrow(() -> new SignInException("email-or-password-incorrect"));
 
         if (!passwordEncoder.matches(signIn.password(), user.getPassword()))
-            throw new SignInException(
-                    messageSource.getMessage("sign-in-exception", null, LocaleContextHolder.getLocale())
-            );
+            throw new SignInException("email-or-password-incorrect");
 
         String accessToken = jwtService.generateToken(user.getDisplayUsername(), user.getUsername());
         String refreshToken = UUID.randomUUID().toString();
@@ -79,15 +67,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(noRollbackFor = SessionExpiredException.class)
     public RefreshTokenResponse refreshToken(String refreshToken) {
         RefreshToken refreshTokenDomain = refreshTokenRepository.getHashedRefreshToken(hashToken(refreshToken))
-                .orElseThrow(() -> new SessionExpiredException(
-                        messageSource.getMessage("session-expired-exception.not-found", null, LocaleContextHolder.getLocale()))
-                );
+                .orElseThrow(() -> new SessionExpiredException("not-found"));
 
         if (refreshTokenDomain.isRevoked() || refreshTokenDomain.getExpiresAt().isBefore(Instant.now())) {
             refreshTokenRepository.deleteById(refreshTokenDomain.getId());
-            throw new SessionExpiredException(
-                    messageSource.getMessage("session-expired-exception.expired", null, LocaleContextHolder.getLocale())
-            );
+            throw new SessionExpiredException("expired");
         }
 
         User user = refreshTokenDomain.getUser();

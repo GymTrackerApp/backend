@@ -45,7 +45,7 @@ public class User implements UserDetails {
         boolean exerciseWithSameNameExists = exercises.stream()
                 .anyMatch(exercise -> exercise.getName().equals(name));
         if (exerciseWithSameNameExists) {
-            throw new ExerciseAlreadyExistsException("exercise-already-exists-exception.adding-existing-exercise-to-exercises");
+            throw new ExerciseAlreadyExistsException("adding-existing-exercise-to-exercises");
         }
 
         Exercise newExercise = Exercise.builder()
@@ -64,14 +64,14 @@ public class User implements UserDetails {
         Exercise exercise = exercises.stream()
                 .filter(ex -> ex.getExerciseId().equals(existingExerciseId))
                 .findFirst()
-                .orElseThrow(() -> new ExerciseDoesNotExistException("exercise-does-not-exist-exception.updating-exercise"));
+                .orElseThrow(() -> new ExerciseDoesNotExistException("updating-exercise"));
 
         boolean exerciseWithSameNameExists = exercises.stream()
                 .filter(ex -> !ex.getExerciseId().equals(existingExerciseId))
                 .anyMatch(ex -> ex.getName().equals(newExerciseName));
 
         if (exerciseWithSameNameExists) {
-            throw new ExerciseAlreadyExistsException("exercise-already-exists-exception.adding-exercise-with-same-name");
+            throw new ExerciseAlreadyExistsException("adding-exercise-with-same-name");
         }
 
         exercise.setName(newExerciseName);
@@ -91,7 +91,7 @@ public class User implements UserDetails {
         validateDuplicatedExercises(trainingPlanItems);
 
         if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
-            throw new TrainingPlansAmountExceededException("training-plans-amount-exceeded-exception.adding-training-plan", MAX_TRAINING_PLANS_PER_USER);
+            throw new TrainingPlansAmountExceededException("adding-training-plan", MAX_TRAINING_PLANS_PER_USER);
         }
 
         validateDuplicatedPlanName(planName);
@@ -112,14 +112,14 @@ public class User implements UserDetails {
         TrainingPlan trainingPlan = plans.stream()
                 .filter(plan -> plan.getId().equals(existingPlanId))
                 .findFirst()
-                .orElseThrow(() -> new TrainingDoesNotExistException("training-does-not-exist-exception.updating-training"));
+                .orElseThrow(() -> new TrainingDoesNotExistException("updating-training"));
 
         boolean planWithSameNameExists = plans.stream()
                 .filter(plan -> !plan.getId().equals(existingPlanId))
                 .anyMatch(plan -> plan.getName().equals(newName));
 
         if (planWithSameNameExists) {
-            throw new PlanWithSameNameAlreadyExistsException("plan-with-same-name-already-exists-exception.adding-training-plan");
+            throw new PlanWithSameNameAlreadyExistsException("adding-training-plan");
         }
 
         validateDuplicatedExercises(newPlanItems);
@@ -131,7 +131,7 @@ public class User implements UserDetails {
 
     public void removeCustomTrainingPlan(long planId) {
         if (plans.stream().noneMatch(plan -> plan.getId().equals(planId))) {
-            throw new TrainingDoesNotExistException("training-does-not-exist-exception.deleting-training");
+            throw new TrainingDoesNotExistException("deleting-training");
         }
 
         plans.removeIf(plan -> plan.getId().equals(planId));
@@ -142,7 +142,7 @@ public class User implements UserDetails {
                 .anyMatch(trainingPlan -> trainingPlan.getName().equals(planName));
 
         if (planWithSameNameExists) {
-            throw new PlanWithSameNameAlreadyExistsException("plan-with-same-name-already-exists-exception.adding-training-plan");
+            throw new PlanWithSameNameAlreadyExistsException("adding-training-plan");
         }
     }
 
@@ -153,7 +153,7 @@ public class User implements UserDetails {
                 .count();
 
         if (distinctExercisesCount != trainingPlanItems.size()) {
-            throw new DuplicatedExercisesException("Training plan items contain duplicated exercises");
+            throw new DuplicatedExercisesException("adding-duplicated-exercises");
         }
     }
 

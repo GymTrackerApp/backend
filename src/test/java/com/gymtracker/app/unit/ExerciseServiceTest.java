@@ -17,9 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.MessageSource;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -37,9 +35,6 @@ class ExerciseServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Spy
-    private MessageSource messageSource;
 
     @InjectMocks
     private ExerciseServiceImpl exerciseService;
