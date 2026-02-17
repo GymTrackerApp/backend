@@ -14,11 +14,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,10 +37,12 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/workouts")
 @RequiredArgsConstructor
+@Validated
 public class WorkoutController {
     private final WorkoutService workoutService;
     private final TrainingPlanService trainingPlanService;
     private final WorkoutMapper workoutMapper;
+    private final MessageSource messageSource;
 
     @GetMapping
     public ResponseEntity<List<WorkoutDTO>> getWorkouts(
@@ -65,7 +70,9 @@ public class WorkoutController {
         workoutService.createWorkout(workoutCreationRequest, UUID.fromString(userDetails.getUsername()));
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new MessageResponse("Workout created successfully"));
+                .body(new MessageResponse(
+                        messageSource.getMessage("message-response.workout-created-successfully", null, LocaleContextHolder.getLocale())
+                ));
     }
 
     @GetMapping("/exercises/{exerciseId}/history")
@@ -73,8 +80,8 @@ public class WorkoutController {
             @PathVariable("exerciseId") long exerciseId,
 
             @Valid
-            @Positive(message = "Previous workouts parameter must be positive")
-            @Max(value = 10, message = "Previous workouts parameter must not exceed 10")
+            @Positive(message = "{previous-workouts-parameter.positive}")
+            @Max(value = 10, message = "{previous-workouts-parameter.max}")
             @RequestParam(name = "previousWorkouts", defaultValue = "3") int previousWorkouts,
 
             @AuthenticationPrincipal UserDetails userDetails) {

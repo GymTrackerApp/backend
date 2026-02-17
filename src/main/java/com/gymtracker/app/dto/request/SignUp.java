@@ -7,15 +7,15 @@ import lombok.Builder;
 
 @Builder
 public record SignUp(
-        @NotBlank(message = "Username is required")
-        @Size(min = 2, max = 25, message = "Username length should be 2-25 characters")
+        @NotBlank(message = "{sign-up.username.blank}")
+        @Size(min = 2, max = 25, message = "{sign-up.username.size}")
         String username,
 
-        @NotBlank(message = "Email is required")
-        @Email(message = "Email address should follow the pattern: user@domain.com.")
+        @NotBlank(message = "{sign-up.email.blank}")
+        @Email(message = "{sign-up.email.pattern}")
         String email,
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 8, max = 128, message = "The password must be between 8-128 characters long")
+        @NotBlank(message = "{sign-up.password.blank}")
+        @Size(min = 8, max = 128, message = "{sign-up.password.size}")
         String password) {
 }

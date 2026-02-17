@@ -12,6 +12,8 @@ import com.gymtracker.app.repository.TrainingPlanRepository;
 import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.service.TrainingPlanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,17 +28,29 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final ExerciseRepository exerciseRepository;
 
+    private final MessageSource messageSource;
+
     @Override
     @Transactional
     public void generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot create training plan for non-existing user"));
+                .orElseThrow(
+                        () -> new UserDoesNotExistException(
+                                messageSource.getMessage("user-does-not-exist-exception.creating-plan", null, LocaleContextHolder.getLocale())
+                        )
+                );
 
         List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
                 .stream()
                 .map(planItem -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
-                        .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
+                        .orElseThrow(() -> new ExerciseDoesNotExistException(
+                                messageSource.getMessage(
+                                        "exercise-does-not-exist-exception.id-not-found",
+                                        new Object[]{planItem.exerciseId()},
+                                        LocaleContextHolder.getLocale()
+                                ))
+                        );
 
                     return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
                 })
@@ -55,7 +69,11 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Transactional(readOnly = true)
     public List<TrainingPlan> getUserTrainingPlans(UUID ownerId) {
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plans for non-existing user"));
+                .orElseThrow(
+                        () -> new UserDoesNotExistException(
+                                messageSource.getMessage("user-does-not-exist-exception.retrieving-plans", null, LocaleContextHolder.getLocale())
+                        )
+                );
 
         return owner.getPlans();
     }
@@ -63,7 +81,9 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Override
     public TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId) {
         User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException(
+                        messageSource.getMessage("user-does-not-exist-exception.retrieving-plan", null, LocaleContextHolder.getLocale())
+                ));
         List<TrainingPlan> userPlans = owner.getPlans();
 
         Optional<TrainingPlan> trainingPlan = userPlans.stream()
@@ -73,28 +93,38 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
         return trainingPlan.orElseGet(() -> getAllPredefinedTrainingPlans().stream()
                 .filter(plan -> plan.getId().equals(trainingPlanId))
                 .findFirst()
-                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist")));
+                .orElseThrow(() -> new TrainingDoesNotExistException(
+                        messageSource.getMessage("training-does-not-exist-exception.not-found", null, LocaleContextHolder.getLocale())
+                )));
     }
 
     @Override
     public TrainingPlan getTrainingPlanByIdForWorkoutHistory(long trainingPlanId, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot retrieve training plan for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.retrieving-plan", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId)) {
-            throw new TrainingDoesNotExistException("Cannot retrieve non-accessible training plan");
+            throw new TrainingDoesNotExistException(
+                    messageSource.getMessage("training-does-not-exist-exception.not-accessible", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return trainingPlanRepository.findById(trainingPlanId)
-                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist"));
+                .orElseThrow(() -> new TrainingDoesNotExistException(
+                        messageSource.getMessage("training-does-not-exist-exception.not-found", null, LocaleContextHolder.getLocale())
+                ));
     }
 
     @Override
     @Transactional
     public void deleteTrainingPlan(long planId, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot delete training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException(
+                        messageSource.getMessage("user-does-not-exist-exception.deleting-plan", null, LocaleContextHolder.getLocale())
+                ));
 
         user.removeCustomTrainingPlan(planId);
 
@@ -105,13 +135,17 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Transactional
     public void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot update training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException(
+                        messageSource.getMessage("user-does-not-exist-exception.updating-plan", null, LocaleContextHolder.getLocale())
+                ));
 
         List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
                 .stream()
                 .map(planItem -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
-                            .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
+                            .orElseThrow(() -> new ExerciseDoesNotExistException(
+                                    messageSource.getMessage("exercise-does-not-exist-exception.id-not-found", new Object[] {planItem.exerciseId()}, LocaleContextHolder.getLocale())
+                            ));
 
                     return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
                 })

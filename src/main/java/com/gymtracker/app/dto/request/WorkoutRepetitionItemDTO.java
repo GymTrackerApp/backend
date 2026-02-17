@@ -26,19 +26,19 @@ public class WorkoutRepetitionItemDTO extends WorkoutItemDTO {
     private static final int MAX_WEIGHT = 600;
 
     @Valid
-    @NotNull(message = "Sets information should be provided")
-    @Size(min = 1, max = MAX_SETS, message = "Sets amount must be between {min} and {max} for each exercise")
+    @NotNull(message = "{workout-repetition-item.sets.null}")
+    @Size(min = 1, max = MAX_SETS, message = "{workout-repetition-item.sets.size}")
     private List<ExerciseSet> sets;
 
     @Builder
     public record ExerciseSet(
-            @NotNull(message = "Sets amount must be provided")
-            @PositiveOrZero(message = "Reps cannot be negative")
-            @Max(value = MAX_REPS, message = "Reps amount cannot exceed {value}")
+            @NotNull(message = "{workout-repetition-item.exercise-set.reps.null}")
+            @PositiveOrZero(message = "{workout-repetition-item.exercise-set.reps.positive-or-zero}")
+            @Max(value = MAX_REPS, message = "{workout-repetition-item.exercise-set.reps.max}")
             int reps,
 
-            @NotNull(message = "Weight must be provided")
-            @PositiveOrZero(message = "Weight cannot be negative")
-            @Max(value = MAX_WEIGHT, message = "Weight cannot exceed {value} kg")
+            @NotNull(message = "{workout-repetition-item.exercise-set.weight.null}")
+            @PositiveOrZero(message = "{workout-repetition-item.exercise-set.weight.positive-or-zero}")
+            @Max(value = MAX_WEIGHT, message = "{workout-repetition-item.exercise-set.weight.max}")
             BigDecimal weight) {}
 }

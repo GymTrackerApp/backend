@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -64,6 +65,9 @@ class WorkoutServiceTest {
 
     @Spy
     private WorkoutItemMapper workoutItemMapper = Mappers.getMapper(WorkoutItemMapper.class);
+
+    @Spy
+    private MessageSource messageSource;
 
     private final ArgumentCaptor<Workout> argumentCaptor = ArgumentCaptor.forClass(Workout.class);
 

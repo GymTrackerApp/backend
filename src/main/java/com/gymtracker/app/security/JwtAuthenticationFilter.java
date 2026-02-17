@@ -7,6 +7,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +30,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final RequestMatcher publicEndpoints;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final MessageSource messageSource;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, MessageSource messageSource) {
         this.userDetailsService = userDetailsService;
         this.publicEndpoints = new OrRequestMatcher(
                 PathPatternRequestMatcher.withDefaults().matcher("/"),
@@ -43,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.GET, "/plans")
         );
         this.jwtService = jwtService;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -55,7 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            ErrorResponse errorResponse = new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Make sure that the authorization header has been included and that it contains JWT.");
+            ErrorResponse errorResponse = new ErrorResponse(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    messageSource.getMessage("no-authorization-header-exception", null, LocaleContextHolder.getLocale())
+            );
             writeJsonErrorResponse(response, errorResponse);
             return;
         }
@@ -66,7 +73,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             userId = jwtService.extractSubject(jwt);
         } catch (JwtException e) {
-            writeJsonErrorResponse(response, new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token."));
+            writeJsonErrorResponse(response, new ErrorResponse(
+                    HttpServletResponse.SC_UNAUTHORIZED,
+                    messageSource.getMessage("invalid-or-expired-token-exception", null, LocaleContextHolder.getLocale()))
+            );
             return;
         }
 
@@ -77,7 +87,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,  userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (UsernameNotFoundException e) {
-                writeJsonErrorResponse(response, new ErrorResponse(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: Invalid credentials or user not found."));
+                writeJsonErrorResponse(response, new ErrorResponse(
+                        HttpServletResponse.SC_UNAUTHORIZED,
+                        messageSource.getMessage("authentication-failed", null, LocaleContextHolder.getLocale()))
+                );
                 return;
             }
         }

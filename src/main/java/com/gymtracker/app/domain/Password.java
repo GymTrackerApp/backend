@@ -5,7 +5,7 @@ import com.gymtracker.app.exception.InvalidPasswordException;
 public record Password(String hashedPassword) {
     public Password {
         if (hashedPassword == null || hashedPassword.isEmpty()) {
-            throw new InvalidPasswordException("Hashed password cannot be null or empty");
+            throw new InvalidPasswordException("hashed-password-null");
         }
     }
 }

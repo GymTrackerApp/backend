@@ -9,6 +9,8 @@ import com.gymtracker.app.dto.response.SignInResponse;
 import com.gymtracker.app.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,12 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthService authService;
 
+    private final MessageSource messageSource;
+
     @PostMapping("/sign-up")
     public ResponseEntity<MessageResponse> signUp(@Valid @RequestBody SignUp signUp) {
         authService.signUp(signUp);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new MessageResponse("User registered successfully"));
+                .body(new MessageResponse(
+                        messageSource.getMessage("message-response.user-registered-successfully", null, LocaleContextHolder.getLocale())
+                ));
     }
 
     @PostMapping("/sign-in")
@@ -50,6 +56,8 @@ public class AuthController {
     @PostMapping("/sign-out")
     public ResponseEntity<MessageResponse> signOut(@Valid @RequestBody RefreshTokenRequest refreshTokenRequest) {
         authService.signOut(refreshTokenRequest.refreshToken());
-        return ResponseEntity.ok(new MessageResponse("User signed out successfully"));
+        return ResponseEntity.ok(new MessageResponse(
+                messageSource.getMessage("message-response.user-signed-out-successfully", null, LocaleContextHolder.getLocale())
+        ));
     }
 }

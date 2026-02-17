@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -29,6 +30,9 @@ class UserServiceTest {
 
     @Spy
     private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
+
+    @Spy
+    private MessageSource messageSource;
 
     @Test
     void contextLoads() {

@@ -1,7 +1,9 @@
 package com.gymtracker.app.exception;
 
-public class DomainException extends RuntimeException {
-    public DomainException(String message) {
-        super(message);
+import org.springframework.http.HttpStatus;
+
+public class DomainException extends BaseKeyException {
+    public DomainException(String subKey, Object... args) {
+        super("domain-exception." + subKey, HttpStatus.BAD_REQUEST, args);
     }
 }

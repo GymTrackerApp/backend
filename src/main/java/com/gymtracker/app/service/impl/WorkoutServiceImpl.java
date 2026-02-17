@@ -17,6 +17,8 @@ import com.gymtracker.app.repository.UserRepository;
 import com.gymtracker.app.repository.WorkoutRepository;
 import com.gymtracker.app.service.WorkoutService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,12 +36,15 @@ public class WorkoutServiceImpl implements WorkoutService {
     private final TrainingPlanRepository trainingPlanRepository;
 
     private final WorkoutItemMapper workoutItemMapper;
+    private final MessageSource messageSource;
 
     @Override
     @Transactional
     public void createWorkout(WorkoutCreationRequest request, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot create workout for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.creating-workout", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (request.trainingId() != null
@@ -48,7 +53,9 @@ public class WorkoutServiceImpl implements WorkoutService {
                     ||
             trainingPlanRepository.isDeleted(request.trainingId()))
         ) {
-            throw new TrainingDoesNotExistException("Cannot create workout for non-accessible training plan");
+            throw new TrainingDoesNotExistException(
+                    messageSource.getMessage("training-does-not-exist-exception.creating-workout", null, LocaleContextHolder.getLocale())
+            );
         }
 
         int distinctExerciseCount = (int) request.workoutItems().stream()
@@ -57,13 +64,17 @@ public class WorkoutServiceImpl implements WorkoutService {
                 .count();
 
         if (distinctExerciseCount != request.workoutItems().size()) {
-            throw new DuplicatedExercisesException("Cannot create workout with duplicated exercises");
+            throw new DuplicatedExercisesException(
+                    messageSource.getMessage("duplicated-exercises-exception.creating-workout", null, LocaleContextHolder.getLocale())
+            );
         }
 
         List<WorkoutItem> workoutItems = request.workoutItems().stream()
                 .map(workoutItemDTO -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(workoutItemDTO.getExerciseId(), userId)
-                        .orElseThrow(() -> new ExerciseDoesNotExistException("Cannot create workout with non-existing exercise"));
+                        .orElseThrow(() -> new ExerciseDoesNotExistException(
+                                messageSource.getMessage("exercise-does-not-exist-exception.creating-workout", null, LocaleContextHolder.getLocale())
+                        ));
                     WorkoutItem workoutItem = workoutItemMapper.workoutItemDTOToWorkoutItem(workoutItemDTO);
                     workoutItem.setExercise(exercise);
                     return workoutItem;
@@ -77,11 +88,15 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public List<Workout> getWorkoutExerciseHistory(long exerciseId, int previousWorkouts, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot get workout history for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.getting-workouts-history", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!exerciseRepository.existsInExercisesAccessibleByUser(exerciseId, userId)) {
-            throw new ExerciseDoesNotExistException("Cannot get exercise stats for non-existing exercise");
+            throw new ExerciseDoesNotExistException(
+                    messageSource.getMessage("exercise-does-not-exist-exception.getting-exercise-stats", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return workoutRepository.findLastWorkoutsContainingExercise(exerciseId, previousWorkouts, userId);
@@ -90,15 +105,20 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public List<Workout> getWorkoutExerciseHistoryByWorkoutInPeriod(long exerciseId, LocalDate startDate, LocalDate endDate, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot get workout history for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.getting-workouts-history", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!exerciseRepository.existsInExercisesAccessibleByUser(exerciseId, userId)) {
-            throw new ExerciseDoesNotExistException("Cannot get exercise stats for non-existing exercise");
+            throw new ExerciseDoesNotExistException(
+                    messageSource.getMessage("exercise-does-not-exist-exception.getting-exercise-stats", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!isPeriodValid(startDate, endDate)) {
-            throw new InvalidPeriodException("Invalid date range provided");
+            throw new InvalidPeriodException(
+                    messageSource.getMessage("invalid-date-range", null, LocaleContextHolder.getLocale()));
         }
 
         return workoutRepository.findWorkoutsContainingExerciseInPeriod(exerciseId, startDate, endDate, userId);
@@ -107,18 +127,24 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public List<Workout> getWorkoutTrainingHistory(long trainingId, LocalDate startDate, LocalDate endDate, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot get workout history for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.getting-workouts-history", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingId, userId)
                 ||
             trainingPlanRepository.isDeleted(trainingId)
         ) {
-            throw new TrainingDoesNotExistException("Cannot get workout history for non-existing training plan");
+            throw new TrainingDoesNotExistException(
+                    messageSource.getMessage("training-does-not-exist-exception.getting-workouts-history", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (!isPeriodValid(startDate, endDate)) {
-            throw new InvalidPeriodException("Invalid date range provided");
+            throw new InvalidPeriodException(
+                    messageSource.getMessage("invalid-date-range", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return workoutRepository.findWorkoutsByTrainingIdAndPeriod(trainingId, startDate, endDate, userId);
@@ -127,15 +153,21 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public List<Workout> getWorkouts(Pageable pageable, LocalDate startDate, LocalDate endDate, Long trainingPlanId, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot get workouts for non-existing user");
+            throw new UserDoesNotExistException(
+                    messageSource.getMessage("user-does-not-exist-exception.getting-workouts", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (startDate != null && endDate != null && !isPeriodValid(startDate, endDate)) {
-            throw new InvalidPeriodException("Invalid date range provided");
+            throw new InvalidPeriodException(
+                    messageSource.getMessage("invalid-date-range", null, LocaleContextHolder.getLocale())
+            );
         }
 
         if (trainingPlanId != null && !trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId)) {
-            throw new TrainingDoesNotExistException("Cannot get workouts for non-existing training plan");
+            throw new TrainingDoesNotExistException(
+                    messageSource.getMessage("training-does-not-exist-exception.getting-workouts", null, LocaleContextHolder.getLocale())
+            );
         }
 
         return workoutRepository.findUserWorkouts(pageable, startDate, endDate, trainingPlanId, userId);

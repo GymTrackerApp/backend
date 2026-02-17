@@ -8,6 +8,8 @@ import com.gymtracker.app.mapper.TrainingPlanMapper;
 import com.gymtracker.app.service.TrainingPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,6 +32,7 @@ import java.util.UUID;
 public class TrainingPlanController {
     private final TrainingPlanService trainingPlanService;
     private final TrainingPlanMapper trainingPlanMapper;
+    private final MessageSource messageSource;
 
     @PostMapping
     public ResponseEntity<MessageResponse> createCustomTrainingPlan(
@@ -38,7 +41,9 @@ public class TrainingPlanController {
     ) {
         trainingPlanService.generateCustomTrainingPlan(trainingPlanCreationRequest, UUID.fromString(userDetails.getUsername()));
 
-        MessageResponse response = new MessageResponse("Custom training plan created successfully");
+        MessageResponse response = new MessageResponse(
+                messageSource.getMessage("message-response.training-plan-created-successfully", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -87,7 +92,9 @@ public class TrainingPlanController {
     ) {
         trainingPlanService.deleteTrainingPlan(planId, UUID.fromString(userDetails.getUsername()));
 
-        MessageResponse response = new MessageResponse("Training plan deleted successfully");
+        MessageResponse response = new MessageResponse(
+                messageSource.getMessage("message-response.training-plan-deleted-successfully", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -103,7 +110,9 @@ public class TrainingPlanController {
                 planId
         );
 
-        MessageResponse response = new MessageResponse("Training plan updated successfully");
+        MessageResponse response = new MessageResponse(
+                messageSource.getMessage("message-response.training-plan-updated-successfully", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
