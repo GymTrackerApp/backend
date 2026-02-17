@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void signUp(SignUp signUp) {
         if (userRepository.existsByEmail(signUp.email()) || userRepository.existsByUsername(signUp.username()))
-            throw new UserAlreadyExistsException("user-already-exists-exception");
+            throw new UserAlreadyExistsException("same-email-or-username");
 
         User user = userMapper.signUpToUser(signUp);
         user.updatePassword(passwordEncoder.encode(signUp.password()));

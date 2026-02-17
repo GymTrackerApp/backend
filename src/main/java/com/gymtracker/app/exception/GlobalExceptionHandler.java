@@ -25,10 +25,13 @@ public class GlobalExceptionHandler {
     private final MessageSource messageSource;
 
     @ExceptionHandler(value = {SignInException.class, SessionExpiredException.class})
-    public ResponseEntity<ErrorResponse> handleSignInException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleSignInException(BaseKeyException e) {
         log.error("Authentication exception occurred", e);
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                messageSource.getMessage(e.getKey(), e.getArgs(), LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
@@ -84,7 +87,7 @@ public class GlobalExceptionHandler {
                 String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
                 ErrorResponse errorResponse = new ErrorResponse(
                         HttpStatus.BAD_REQUEST,
-                        messageSource.getMessage("invalid-category", null, LocaleContextHolder.getLocale()) + " " + acceptedValues
+                        messageSource.getMessage("invalid-category", new Object[] {acceptedValues}, LocaleContextHolder.getLocale())
                 );
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }
@@ -102,17 +105,6 @@ public class GlobalExceptionHandler {
         log.error("Bad request exception occurred", e);
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-    @ExceptionHandler(value = DomainException.class)
-    public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
-        log.error("Domain exception occurred", e);
-        String messageKey = e.getKey();
-        ErrorResponse errorResponse = new ErrorResponse(
-                e.getStatus(),
-                messageSource.getMessage(messageKey, e.getArgs(), LocaleContextHolder.getLocale())
-        );
-        return ResponseEntity.status(e.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler
