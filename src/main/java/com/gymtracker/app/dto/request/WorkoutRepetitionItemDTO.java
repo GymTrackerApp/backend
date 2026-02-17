@@ -32,7 +32,6 @@ public class WorkoutRepetitionItemDTO extends WorkoutItemDTO {
 
     @Builder
     public record ExerciseSet(
-            @NotNull(message = "{workout-repetition-item.exercise-set.reps.null}")
             @PositiveOrZero(message = "{workout-repetition-item.exercise-set.reps.positive-or-zero}")
             @Max(value = MAX_REPS, message = "{workout-repetition-item.exercise-set.reps.max}")
             int reps,

@@ -71,7 +71,7 @@ public class User implements UserDetails {
                 .anyMatch(ex -> ex.getName().equals(newExerciseName));
 
         if (exerciseWithSameNameExists) {
-            throw new ExerciseAlreadyExistsException("adding-exercise-with-same-name");
+            throw new ExerciseAlreadyExistsException("adding-existing-exercise-to-exercises");
         }
 
         exercise.setName(newExerciseName);
