@@ -11,6 +11,6 @@ public record WorkoutCreationRequest(
         Long trainingId,
 
         @Valid
-        @NotEmpty(message = "Cannot create a workout without exercises")
+        @NotEmpty(message = "{workout.workout-items.empty}")
         List<WorkoutItemDTO> workoutItems) {
 }

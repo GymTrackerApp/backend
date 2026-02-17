@@ -45,7 +45,7 @@ public class User implements UserDetails {
         boolean exerciseWithSameNameExists = exercises.stream()
                 .anyMatch(exercise -> exercise.getName().equals(name));
         if (exerciseWithSameNameExists) {
-            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
+            throw new ExerciseAlreadyExistsException("adding-existing-exercise-to-exercises");
         }
 
         Exercise newExercise = Exercise.builder()
@@ -64,14 +64,14 @@ public class User implements UserDetails {
         Exercise exercise = exercises.stream()
                 .filter(ex -> ex.getExerciseId().equals(existingExerciseId))
                 .findFirst()
-                .orElseThrow(() -> new ExerciseDoesNotExistException("Cannot update non-existing exercise"));
+                .orElseThrow(() -> new ExerciseDoesNotExistException("updating-exercise"));
 
         boolean exerciseWithSameNameExists = exercises.stream()
                 .filter(ex -> !ex.getExerciseId().equals(existingExerciseId))
                 .anyMatch(ex -> ex.getName().equals(newExerciseName));
 
         if (exerciseWithSameNameExists) {
-            throw new ExerciseAlreadyExistsException("Exercise with the same name already exists in your exercises");
+            throw new ExerciseAlreadyExistsException("adding-existing-exercise-to-exercises");
         }
 
         exercise.setName(newExerciseName);
@@ -81,7 +81,7 @@ public class User implements UserDetails {
 
     public void removeCustomExercise(long exerciseId) {
         if (exercises.stream().noneMatch(exercise -> exercise.getExerciseId().equals(exerciseId))) {
-            throw new ExerciseDoesNotExistException("Cannot delete non-existing exercise");
+            throw new ExerciseDoesNotExistException("exercise-does-not-exist-exception.deleting-exercise");
         }
 
         exercises.removeIf(exercise -> exercise.getExerciseId().equals(exerciseId));
@@ -91,7 +91,7 @@ public class User implements UserDetails {
         validateDuplicatedExercises(trainingPlanItems);
 
         if (plans.size() >= MAX_TRAINING_PLANS_PER_USER) {
-            throw new TrainingPlansAmountExceededException("User cannot have more than " + MAX_TRAINING_PLANS_PER_USER + " training plans");
+            throw new TrainingPlansAmountExceededException("adding-training-plan", MAX_TRAINING_PLANS_PER_USER);
         }
 
         validateDuplicatedPlanName(planName);
@@ -112,14 +112,14 @@ public class User implements UserDetails {
         TrainingPlan trainingPlan = plans.stream()
                 .filter(plan -> plan.getId().equals(existingPlanId))
                 .findFirst()
-                .orElseThrow(() -> new TrainingDoesNotExistException("Cannot update non-existing training plan"));
+                .orElseThrow(() -> new TrainingDoesNotExistException("updating-training"));
 
         boolean planWithSameNameExists = plans.stream()
                 .filter(plan -> !plan.getId().equals(existingPlanId))
                 .anyMatch(plan -> plan.getName().equals(newName));
 
         if (planWithSameNameExists) {
-            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+            throw new PlanWithSameNameAlreadyExistsException("adding-training-plan");
         }
 
         validateDuplicatedExercises(newPlanItems);
@@ -131,7 +131,7 @@ public class User implements UserDetails {
 
     public void removeCustomTrainingPlan(long planId) {
         if (plans.stream().noneMatch(plan -> plan.getId().equals(planId))) {
-            throw new TrainingDoesNotExistException("Cannot delete non-existing training plan");
+            throw new TrainingDoesNotExistException("deleting-training");
         }
 
         plans.removeIf(plan -> plan.getId().equals(planId));
@@ -142,7 +142,7 @@ public class User implements UserDetails {
                 .anyMatch(trainingPlan -> trainingPlan.getName().equals(planName));
 
         if (planWithSameNameExists) {
-            throw new PlanWithSameNameAlreadyExistsException("User already has a training plan with the same name");
+            throw new PlanWithSameNameAlreadyExistsException("adding-training-plan");
         }
     }
 
@@ -153,7 +153,7 @@ public class User implements UserDetails {
                 .count();
 
         if (distinctExercisesCount != trainingPlanItems.size()) {
-            throw new DuplicatedExercisesException("Training plan items contain duplicated exercises");
+            throw new DuplicatedExercisesException("adding-duplicated-exercises");
         }
     }
 

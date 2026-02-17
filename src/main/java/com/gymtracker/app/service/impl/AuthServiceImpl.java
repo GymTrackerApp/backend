@@ -24,7 +24,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HexFormat;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -40,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void signUp(SignUp signUp) {
         if (userRepository.existsByEmail(signUp.email()) || userRepository.existsByUsername(signUp.username()))
-            throw new UserAlreadyExistsException("A user with this email or username already exists.");
+            throw new UserAlreadyExistsException("same-email-or-username");
 
         User user = userMapper.signUpToUser(signUp);
         user.updatePassword(passwordEncoder.encode(signUp.password()));
@@ -51,10 +50,10 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignInResponse signIn(SignIn signIn) {
         User user = userRepository.findByEmail(signIn.email())
-                .orElseThrow(() -> new SignInException("Email or password incorrect"));
+                .orElseThrow(() -> new SignInException("email-or-password-incorrect"));
 
         if (!passwordEncoder.matches(signIn.password(), user.getPassword()))
-            throw new SignInException("Email or password incorrect");
+            throw new SignInException("email-or-password-incorrect");
 
         String accessToken = jwtService.generateToken(user.getDisplayUsername(), user.getUsername());
         String refreshToken = UUID.randomUUID().toString();
@@ -68,11 +67,11 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(noRollbackFor = SessionExpiredException.class)
     public RefreshTokenResponse refreshToken(String refreshToken) {
         RefreshToken refreshTokenDomain = refreshTokenRepository.getHashedRefreshToken(hashToken(refreshToken))
-                .orElseThrow(() -> new SessionExpiredException("Session not found"));
+                .orElseThrow(() -> new SessionExpiredException("not-found"));
 
         if (refreshTokenDomain.isRevoked() || refreshTokenDomain.getExpiresAt().isBefore(Instant.now())) {
             refreshTokenRepository.deleteById(refreshTokenDomain.getId());
-            throw new SessionExpiredException("Session expired. Please sign in again.");
+            throw new SessionExpiredException("expired");
         }
 
         User user = refreshTokenDomain.getUser();

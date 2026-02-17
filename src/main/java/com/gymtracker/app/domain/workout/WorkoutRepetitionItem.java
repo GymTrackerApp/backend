@@ -1,5 +1,6 @@
 package com.gymtracker.app.domain.workout;
 
+import com.gymtracker.app.exception.DomainException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,13 +21,13 @@ public class WorkoutRepetitionItem extends WorkoutItem {
     public record ExerciseSet(int reps, BigDecimal weight) {
         public ExerciseSet {
             if (reps < 0) {
-                throw new IllegalArgumentException("Repetitions cannot be negative");
+                throw new DomainException("negative-reps");
             }
             if (weight == null) {
-                throw new IllegalArgumentException("Weight cannot be null");
+                throw new DomainException("null-weight");
             }
             if (weight.compareTo(BigDecimal.ZERO) < 0) {
-                throw new IllegalArgumentException("Weight cannot be negative");
+                throw new DomainException("negative-weight");
             }
         }
     }

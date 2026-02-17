@@ -8,6 +8,8 @@ import com.gymtracker.app.mapper.ExerciseMapper;
 import com.gymtracker.app.service.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class ExerciseController {
     private final ExerciseService exerciseService;
     private final ExerciseMapper exerciseMapper;
+    private final MessageSource messageSource;
 
     @PostMapping
     public ResponseEntity<ExerciseDTO> createCustomExercise(
@@ -71,7 +74,9 @@ public class ExerciseController {
             @AuthenticationPrincipal UserDetails userDetails) {
         exerciseService.deleteCustomExercise(exerciseId, UUID.fromString(userDetails.getUsername()));
 
-        MessageResponse messageResponse = new MessageResponse("Exercise deleted successfully");
+        MessageResponse messageResponse = new MessageResponse(
+                messageSource.getMessage("message-response.exercise-deleted-successfully", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.OK).body(messageResponse);
     }
 

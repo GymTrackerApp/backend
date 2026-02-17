@@ -19,7 +19,7 @@ public class Workout {
 
     public static Workout create(UUID userId, Long trainingId, List<WorkoutItem> workoutItems) {
         if (workoutItems == null || workoutItems.isEmpty()) {
-            throw new DomainException("Workout must contain at least one exercise");
+            throw new DomainException("workout-exercises-minimal-amount");
         }
 
         return Workout.builder()

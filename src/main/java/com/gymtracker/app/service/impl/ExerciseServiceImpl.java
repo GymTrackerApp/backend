@@ -24,10 +24,10 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Override
     public Exercise createCustomExercise(Exercise exercise, UUID ownerId) {
         if (exerciseRepository.existsByNameAndOwnerIsNull(exercise.getName()))
-            throw new ExerciseAlreadyExistsException(String.format("Exercise with name '%s' already exists in predefined exercises",  exercise.getName()));
+            throw new ExerciseAlreadyExistsException("predefined-exercise", exercise.getName());
 
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserDoesNotExistException("Owner not found"));
+                .orElseThrow(() -> new UserDoesNotExistException("owner-not-found"));
 
         Exercise customExercise = owner.createCustomExercise(exercise.getName(), exercise.getCategory());
 
@@ -37,7 +37,7 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Override
     public Set<Exercise> getUserExercises(UUID ownerId) {
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserDoesNotExistException("Owner not found"));
+                .orElseThrow(() -> new UserDoesNotExistException("owner-not-found"));
 
         return owner.getExercises();
     }
@@ -51,7 +51,7 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public void deleteCustomExercise(long exerciseId, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot delete exercise for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("deleting-exercise-for-non-existing-user"));
 
         user.removeCustomExercise(exerciseId);
 
@@ -62,10 +62,10 @@ public class ExerciseServiceImpl implements ExerciseService {
     @Transactional
     public Exercise updateCustomExercise(long exerciseId, ExerciseCreationRequest exerciseCreationRequest, UUID userId) {
         if (exerciseRepository.existsByNameAndOwnerIsNull(exerciseCreationRequest.name()))
-            throw new ExerciseAlreadyExistsException("Exercise already exists in predefined exercises");
+            throw new ExerciseAlreadyExistsException("predefined-exercise", exerciseCreationRequest.name());
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot update exercise for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("updating-exercise-for-non-existing-user"));
 
         Exercise updatedExercise = user.updateCustomExercise(exerciseId, exerciseCreationRequest.name(), exerciseCreationRequest.category());
 

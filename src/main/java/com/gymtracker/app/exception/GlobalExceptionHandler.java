@@ -3,8 +3,11 @@ package com.gymtracker.app.exception;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.gymtracker.app.dto.response.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,13 +20,18 @@ import java.util.Arrays;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    private final MessageSource messageSource;
 
     @ExceptionHandler(value = {SignInException.class, SessionExpiredException.class})
-    public ResponseEntity<ErrorResponse> handleSignInException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleSignInException(BaseKeyException e) {
         log.error("Authentication exception occurred", e);
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.UNAUTHORIZED, e.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED,
+                messageSource.getMessage(e.getKey(), e.getArgs(), LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
@@ -31,7 +39,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ignored) {
         log.error("User already exists exception occurred");
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "The submitted data is invalid");
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                messageSource.getMessage("submitted-data-invalid", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
@@ -41,7 +52,7 @@ public class GlobalExceptionHandler {
 
         String errorMessage = e.getBindingResult().getFieldError() != null
                 ? e.getBindingResult().getFieldError().getDefaultMessage()
-                : "Validation exception occurred";
+                : messageSource.getMessage("validation-exception", null, LocaleContextHolder.getLocale());
         ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, errorMessage);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
@@ -54,19 +65,11 @@ public class GlobalExceptionHandler {
                 .flatMap(parameterValidationResult -> parameterValidationResult.getResolvableErrors().stream())
                 .map(MessageSourceResolvable::getDefaultMessage)
                 .findFirst()
-                .orElse("Validation exception occurred");
+                .orElse(messageSource.getMessage("validation-exception", null, LocaleContextHolder.getLocale()));
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST, errorMessage));
-    }
-
-    @ExceptionHandler(value = ExerciseAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleExerciseAlreadyExistsException(ExerciseAlreadyExistsException e) {
-        log.error("Exercise already exists exception occurred", e);
-
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.CONFLICT, e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(value = ConstraintViolationException.class)
@@ -77,14 +80,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(value = {UserDoesNotExistException.class, ExerciseDoesNotExistException.class, TrainingDoesNotExistException.class})
-    public ResponseEntity<ErrorResponse> handleNotFoundException(DomainException e) {
-        log.error("Not found exception occurred", e);
-
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.NOT_FOUND, e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRequestBodyJson(HttpMessageNotReadableException e) {
         log.error("Malformed JSON request", e);
@@ -92,12 +87,15 @@ public class GlobalExceptionHandler {
                 String acceptedValues = Arrays.toString(ife.getTargetType().getEnumConstants());
                 ErrorResponse errorResponse = new ErrorResponse(
                         HttpStatus.BAD_REQUEST,
-                        "Invalid category value, choose one of: " + acceptedValues
+                        messageSource.getMessage("invalid-category", new Object[] {acceptedValues}, LocaleContextHolder.getLocale())
                 );
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
             }
 
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST,
+                messageSource.getMessage("malformed-json-request", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(errorResponse);
     }
@@ -109,17 +107,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    @ExceptionHandler(value = DomainException.class)
-    public ResponseEntity<ErrorResponse> handleDomainException(DomainException e) {
-        log.error("Domain exception occurred", e);
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleBaseKeyException(BaseKeyException e) {
+        log.error("Exception occurred", e);
+        ErrorResponse errorResponse = new ErrorResponse(
+                e.getStatus(),
+                messageSource.getMessage(e.getKey(), e.getArgs(), LocaleContextHolder.getLocale())
+        );
+        return ResponseEntity.status(e.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
         log.error("An unexpected error occurred", e);
-        ErrorResponse errorResponse = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                messageSource.getMessage("unexpected-error", null, LocaleContextHolder.getLocale())
+        );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

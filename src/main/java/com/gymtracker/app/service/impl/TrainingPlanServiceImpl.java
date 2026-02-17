@@ -30,13 +30,13 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Transactional
     public void generateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot create training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("creating-plan"));
 
         List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
                 .stream()
                 .map(planItem -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
-                        .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
+                        .orElseThrow(() -> new ExerciseDoesNotExistException("id-not-found", planItem.exerciseId()));
 
                     return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
                 })
@@ -55,7 +55,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Transactional(readOnly = true)
     public List<TrainingPlan> getUserTrainingPlans(UUID ownerId) {
         User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plans for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("retrieving-plans"));
 
         return owner.getPlans();
     }
@@ -63,7 +63,7 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Override
     public TrainingPlan getTrainingPlanById(long trainingPlanId, UUID userId) {
         User owner = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot retrieve training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("retrieving-plan"));
         List<TrainingPlan> userPlans = owner.getPlans();
 
         Optional<TrainingPlan> trainingPlan = userPlans.stream()
@@ -73,28 +73,28 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
         return trainingPlan.orElseGet(() -> getAllPredefinedTrainingPlans().stream()
                 .filter(plan -> plan.getId().equals(trainingPlanId))
                 .findFirst()
-                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist")));
+                .orElseThrow(() -> new TrainingDoesNotExistException("not-found")));
     }
 
     @Override
     public TrainingPlan getTrainingPlanByIdForWorkoutHistory(long trainingPlanId, UUID userId) {
         if (!userRepository.existsById(userId)) {
-            throw new UserDoesNotExistException("Cannot retrieve training plan for non-existing user");
+            throw new UserDoesNotExistException("retrieving-plan");
         }
 
         if (!trainingPlanRepository.existsInUserAccessiblePlans(trainingPlanId, userId)) {
-            throw new TrainingDoesNotExistException("Cannot retrieve non-accessible training plan");
+            throw new TrainingDoesNotExistException("not-accessible");
         }
 
         return trainingPlanRepository.findById(trainingPlanId)
-                .orElseThrow(() -> new TrainingDoesNotExistException("Selected training plan does not exist"));
+                .orElseThrow(() -> new TrainingDoesNotExistException("not-found"));
     }
 
     @Override
     @Transactional
     public void deleteTrainingPlan(long planId, UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot delete training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("deleting-plan"));
 
         user.removeCustomTrainingPlan(planId);
 
@@ -105,13 +105,13 @@ public class TrainingPlanServiceImpl implements TrainingPlanService {
     @Transactional
     public void updateCustomTrainingPlan(TrainingPlanCreationRequest request, UUID userId, long planId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserDoesNotExistException("Cannot update training plan for non-existing user"));
+                .orElseThrow(() -> new UserDoesNotExistException("updating-plan"));
 
         List<TrainingPlan.PlanItem> trainingPlanItems = request.planItems()
                 .stream()
                 .map(planItem -> {
                     Exercise exercise = exerciseRepository.findExerciseAccessibleByUser(planItem.exerciseId(), userId)
-                            .orElseThrow(() -> new ExerciseDoesNotExistException("Exercise with id " + planItem.exerciseId() + " does not exist"));
+                            .orElseThrow(() -> new ExerciseDoesNotExistException("id-not-found", planItem.exerciseId()));
 
                     return new TrainingPlan.PlanItem(exercise, planItem.defaultSets());
                 })

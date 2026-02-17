@@ -1,7 +1,9 @@
 package com.gymtracker.app.exception;
 
-public class InvalidPeriodException extends RuntimeException {
-    public InvalidPeriodException(String message) {
-        super(message);
+import org.springframework.http.HttpStatus;
+
+public class InvalidPeriodException extends BaseKeyException {
+    public InvalidPeriodException(String subkey) {
+        super("invalid-period-exception." + subkey, HttpStatus.BAD_REQUEST);
     }
 }

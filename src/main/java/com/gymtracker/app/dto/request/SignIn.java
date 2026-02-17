@@ -6,10 +6,10 @@ import lombok.Builder;
 
 @Builder
 public record SignIn(
-        @NotBlank(message = "Email is required")
-        @Email(message = "Email address should follow the pattern: user@domain.com")
+        @NotBlank(message = "{sign-in.email.blank}")
+        @Email(message = "{sign-in.email.pattern}")
         String email,
 
-        @NotBlank(message = "Password is required")
+        @NotBlank(message = "{sign-in.password.blank}")
         String password) {
 }
