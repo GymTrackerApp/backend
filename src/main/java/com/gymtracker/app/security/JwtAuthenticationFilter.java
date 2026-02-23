@@ -60,11 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            ErrorResponse errorResponse = new ErrorResponse(
-                    HttpServletResponse.SC_UNAUTHORIZED,
-                    messageSource.getMessage("no-authorization-header-exception", null, request.getLocale())
-            );
-            writeJsonErrorResponse(response, errorResponse);
+            filterChain.doFilter(request, response);
             return;
         }
 
