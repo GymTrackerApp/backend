@@ -23,7 +23,11 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            JwtAuthenticationFilter jwtFilter,
+            CorsConfigurationSource corsConfigurationSource
+    ) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(configurer -> configurer.configurationSource(corsConfigurationSource))
@@ -35,6 +39,7 @@ public class SecurityConfig {
                                 .requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/exercises").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/plans").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
