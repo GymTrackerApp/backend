@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Error | GymTracker Backend</title>
+    <title>Client Error | GymTracker Backend</title>
     <style>
         :root {
             --bg: #09090b;
@@ -65,12 +65,6 @@
             margin-bottom: 1.5rem;
         }
 
-        .action-area {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
         .btn {
             display: block;
             text-align: center;
@@ -96,15 +90,13 @@
             <div class="status-badge">HTTP 4xx SERIES</div>
             <h1>Request Interrupted</h1>
             <p>
-                The backend server could not process this request.
-                This usually happens when the resource doesn't exist or request was incorrect.
+                Your request could not be completed.
+                This usually happens when the resource does not exist, access is denied, or the request was malformed.
             </p>
 
             <div class="divider"></div>
 
-            <div class="action-area">
-                <a href="/" class="btn btn-primary">Return to App</a>
-            </div>
+            <a href="/" class="btn btn-primary">Return to App</a>
         </div>
     </body>
 </html>

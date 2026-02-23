@@ -3,6 +3,7 @@ package com.gymtracker.app.integration.auth;
 import com.gymtracker.app.TestController;
 import com.gymtracker.app.config.UtilsConfig;
 import com.gymtracker.app.domain.User;
+import com.gymtracker.app.security.CustomAuthenticationEntryPoint;
 import com.gymtracker.app.security.JwtAuthenticationFilter;
 import com.gymtracker.app.security.JwtService;
 import com.gymtracker.app.security.SecurityConfig;
@@ -16,12 +17,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
 @WebMvcTest(controllers = TestController.class)
-@Import({JwtAuthenticationFilter.class, JwtService.class, UtilsConfig.class, SecurityConfig.class})
+@Import({JwtAuthenticationFilter.class, JwtService.class, UtilsConfig.class, SecurityConfig.class, CustomAuthenticationEntryPoint.class})
 class ProtectedEndpointTest {
     @Autowired
     private WebTestClient webTestClient;
@@ -32,32 +34,35 @@ class ProtectedEndpointTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
+    @MockitoSpyBean
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Test
     void contextLoads() {
         Assertions.assertNotNull(webTestClient);
     }
 
     @Test
-    void givenNoAuthorizationToken_whenGetProtectedEndpoint_thenReturnsForbidden() {
+    void givenNoAuthorizationToken_whenGetProtectedEndpoint_thenReturnsUnauthorized() {
         webTestClient.get()
                 .uri("/protected")
                 .exchange()
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
     }
 
     @ParameterizedTest
     @ValueSource(strings = {
             "",
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30", // without Bearer
+            "not-a-bearer-prefixed-token",
     })
-    void givenAuthorizationToken_whenInvalidToken_thenReturnsForbidden(String token) {
+    void givenAuthorizationToken_whenInvalidToken_thenReturnsUnauthorized(String token) {
         webTestClient.get()
                 .uri("/protected")
                 .header("Authorization", token)
                 .exchange()
                 .expectStatus()
-                .isForbidden();
+                .isUnauthorized();
     }
 
     @Test
