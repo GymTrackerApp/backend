@@ -38,12 +38,12 @@ class ProtectedEndpointTest {
     }
 
     @Test
-    void givenNoAuthorizationToken_whenGetProtectedEndpoint_thenReturnsUnauthorized() {
+    void givenNoAuthorizationToken_whenGetProtectedEndpoint_thenReturnsForbidden() {
         webTestClient.get()
                 .uri("/protected")
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @ParameterizedTest
@@ -51,13 +51,13 @@ class ProtectedEndpointTest {
             "",
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30", // without Bearer
     })
-    void givenAuthorizationToken_whenInvalidToken_thenReturnsUnauthorized(String token) {
+    void givenAuthorizationToken_whenInvalidToken_thenReturnsForbidden(String token) {
         webTestClient.get()
                 .uri("/protected")
                 .header("Authorization", token)
                 .exchange()
                 .expectStatus()
-                .isUnauthorized();
+                .isForbidden();
     }
 
     @Test
