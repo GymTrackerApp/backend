@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 
 import java.util.List;
 
@@ -35,6 +35,7 @@ public class TrainingPlanEntity {
     @ElementCollection
     @CollectionTable(name = "plan_items", joinColumns = @JoinColumn(name = "training_plan_id"))
     @SQLRestriction("exercise_id IN (SELECT e.exercise_id FROM exercises e WHERE e.is_deleted = false)")
+    @OrderColumn(name = "position")
     private List<PlanItemEntity> planItems;
 
     private boolean isCustom;
